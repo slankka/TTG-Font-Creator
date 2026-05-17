@@ -91,7 +91,7 @@ namespace TTG_Tools
 
             // Reset window title
             if (Form.ActiveForm != null)
-                Form.ActiveForm.Text = "Font Editor - New Font";
+                Form.ActiveForm.Text = "TTG Font Creator - New Font";
 
             // Log the action
             if (textBoxLogOutput != null)
@@ -259,7 +259,7 @@ private ClassesStructs.FontClass.ClassFont CreateEmptyNewFormatTemplateFont(stri
                         saveToolStripMenuItem.Enabled = false;
                         saveAsToolStripMenuItem.Enabled = false;
                         exportCoordinatesToolStripMenuItem1.Enabled = false;
-                        Form.ActiveForm.Text = "Font Editor";
+                        Form.ActiveForm.Text = "TTG Font Creator";
                     }
 
 
@@ -327,7 +327,7 @@ private ClassesStructs.FontClass.ClassFont CreateEmptyNewFormatTemplateFont(stri
                             rbNoKerning.Enabled = false;
                             edited = false;
                             FileInfo fiWii = new FileInfo(FileName);
-                            if (Form.ActiveForm != null) Form.ActiveForm.Text = "Font Editor. Opened file " + fiWii.FullName + " (Wii)";
+                            if (Form.ActiveForm != null) Form.ActiveForm.Text = "TTG Font Creator. Opened file " + fiWii.FullName + " (Wii)";
                             return;
                         }
 
@@ -922,7 +922,7 @@ private ClassesStructs.FontClass.ClassFont CreateEmptyNewFormatTemplateFont(stri
                         rbNoKerning.Enabled = font.NewFormat;
                         edited = false;
                         FileInfo fi = new FileInfo(FileName);
-                        if(Form.ActiveForm != null) Form.ActiveForm.Text = "Font Editor. Opened file " + fi.FullName;
+                        if(Form.ActiveForm != null) Form.ActiveForm.Text = "TTG Font Creator. Opened file " + fi.FullName;
 
                         if (textBoxLogOutput != null && !textBoxLogOutput.IsDisposed)
                         {

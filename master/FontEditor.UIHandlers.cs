@@ -621,11 +621,8 @@ namespace TTG_Tools
                     dataGridViewWithTextures.Rows[foundTexNum].Selected = true;
                 }
 
-                // Update preview
+                // Update preview (main panel, not popup)
                 UpdateTexturePreview();
-
-                // Show a dedicated detail window with zoomed crop around the glyph.
-                ShowGlyphDetailPreview(foundRow, foundTexNum, searchChar);
 
                 textBoxLogOutput.AppendText($"  Found at row {foundRow + 1}, texture page {foundTexNum}\r\n");
 
@@ -644,124 +641,6 @@ namespace TTG_Tools
                 MessageBox.Show($"Character '{searchChar}' (code: {charCode}) not found in this font.",
                     "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-        }
-
-        private void ShowGlyphDetailPreview(int rowIndex, int texNum, string searchChar)
-        {
-            if (basePreviewBitmap == null)
-            {
-                return;
-            }
-
-            float xStart;
-            float xEnd;
-            float yStart;
-            float yEnd;
-            int rowTexNum;
-
-            if (!TryGetGlyphRectFromRow(rowIndex, out xStart, out xEnd, out yStart, out yEnd, out rowTexNum))
-            {
-                return;
-            }
-
-            if (rowTexNum != texNum)
-            {
-                return;
-            }
-
-            int glyphLeft = Math.Max(0, Math.Min(basePreviewBitmap.Width - 1, (int)Math.Floor(xStart)));
-            int glyphTop = Math.Max(0, Math.Min(basePreviewBitmap.Height - 1, (int)Math.Floor(yStart)));
-            int glyphRight = Math.Max(glyphLeft + 1, Math.Min(basePreviewBitmap.Width, (int)Math.Ceiling(xEnd)));
-            int glyphBottom = Math.Max(glyphTop + 1, Math.Min(basePreviewBitmap.Height, (int)Math.Ceiling(yEnd)));
-
-            int glyphWidth = Math.Max(1, glyphRight - glyphLeft);
-            int glyphHeight = Math.Max(1, glyphBottom - glyphTop);
-            int margin = Math.Max(24, Math.Max(glyphWidth, glyphHeight) / 2);
-
-            int cropLeft = Math.Max(0, glyphLeft - margin);
-            int cropTop = Math.Max(0, glyphTop - margin);
-            int cropRight = Math.Min(basePreviewBitmap.Width, glyphRight + margin);
-            int cropBottom = Math.Min(basePreviewBitmap.Height, glyphBottom + margin);
-            int cropWidth = Math.Max(1, cropRight - cropLeft);
-            int cropHeight = Math.Max(1, cropBottom - cropTop);
-
-            Rectangle cropRect = new Rectangle(cropLeft, cropTop, cropWidth, cropHeight);
-            Bitmap cropped = new Bitmap(cropWidth, cropHeight);
-
-            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(cropped))
-            {
-                g.DrawImage(basePreviewBitmap, new Rectangle(0, 0, cropWidth, cropHeight), cropRect, GraphicsUnit.Pixel);
-
-                int rectX = glyphLeft - cropLeft;
-                int rectY = glyphTop - cropTop;
-                int rectW = Math.Max(1, glyphWidth);
-                int rectH = Math.Max(1, glyphHeight);
-                using (Pen pen = new Pen(Color.Red, 2f))
-                {
-                    g.DrawRectangle(pen, rectX, rectY, rectW, rectH);
-                }
-            }
-
-            const int scale = 1; // Keep exact 1:1 pixel mapping for edge inspection.
-            Bitmap zoomed = new Bitmap(cropWidth * scale, cropHeight * scale);
-
-            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(zoomed))
-            {
-                g.InterpolationMode = InterpolationMode.NearestNeighbor;
-                g.PixelOffsetMode = PixelOffsetMode.Half;
-                g.SmoothingMode = SmoothingMode.None;
-                g.Clear(Color.Black);
-                g.DrawImage(cropped, new Rectangle(0, 0, zoomed.Width, zoomed.Height), new Rectangle(0, 0, cropWidth, cropHeight), GraphicsUnit.Pixel);
-            }
-
-            cropped.Dispose();
-
-            Form detailForm = new Form();
-            detailForm.Text = $"Glyph Detail U+{Convert.ToInt32(searchChar[0]):X4} '{searchChar}' (row {rowIndex + 1}, page {texNum})";
-            detailForm.StartPosition = FormStartPosition.Manual;
-
-            int preferredWidth = Math.Min(1100, zoomed.Width + 20);
-            int preferredHeight = Math.Min(900, zoomed.Height + 20);
-            int clientWidth = Math.Max(720, preferredWidth);
-            int clientHeight = Math.Max(420, preferredHeight);
-            detailForm.ClientSize = new Size(clientWidth, clientHeight);
-
-            Rectangle workingArea = Screen.FromControl(this).WorkingArea;
-            int desiredLeft = this.Left + 36;
-            int desiredTop = this.Top + 72;
-            int maxLeft = Math.Max(workingArea.Left, workingArea.Right - detailForm.Width);
-            int maxTop = Math.Max(workingArea.Top, workingArea.Bottom - detailForm.Height);
-            int popupLeft = Math.Max(workingArea.Left, Math.Min(desiredLeft, maxLeft));
-            int popupTop = Math.Max(workingArea.Top, Math.Min(desiredTop, maxTop));
-            detailForm.Location = new Point(popupLeft, popupTop);
-
-            Panel scrollPanel = new Panel();
-            scrollPanel.Dock = DockStyle.Fill;
-            scrollPanel.AutoScroll = true;
-            scrollPanel.BackColor = Color.Black;
-
-            PictureBox detailPicture = new PictureBox();
-            detailPicture.Location = new Point(0, 0);
-            detailPicture.Size = new Size(zoomed.Width, zoomed.Height);
-            detailPicture.BackColor = Color.Black;
-            detailPicture.SizeMode = PictureBoxSizeMode.Normal;
-            detailPicture.Image = zoomed;
-
-            scrollPanel.Controls.Add(detailPicture);
-            detailForm.Controls.Add(scrollPanel);
-            detailForm.FormClosed += (s, e) =>
-            {
-                if (detailPicture.Image != null)
-                {
-                    detailPicture.Image.Dispose();
-                    detailPicture.Image = null;
-                }
-                detailPicture.Dispose();
-                scrollPanel.Dispose();
-                detailForm.Dispose();
-            };
-
-            detailForm.Show(this);
         }
 
         private void textBoxSearchChar_KeyDown(object sender, KeyEventArgs e)
@@ -1236,6 +1115,80 @@ namespace TTG_Tools
 
             // Base — FNT baseline (FntBaseLine in 5VSM/6VSM)
             textBoxBaseAdj.Text = font.FntBaseLine.ToString("0.###");
+        }
+        // ======== Texture Preview Zoom & Pan ========
+        private Point _panStart;
+        private bool _isPanning;
+
+        private void btnZoomIn_Click(object sender, EventArgs e)
+        {
+            int w = pictureBoxTexturePreview.Width + 64;
+            int h = pictureBoxTexturePreview.Height + 64;
+            if (w > 1024) w = 1024;
+            if (h > 1024) h = 1024;
+            pictureBoxTexturePreview.Width = w;
+            pictureBoxTexturePreview.Height = h;
+            ClampPictureBoxPosition();
+        }
+
+        private void btnZoomOut_Click(object sender, EventArgs e)
+        {
+            int w = pictureBoxTexturePreview.Width - 64;
+            int h = pictureBoxTexturePreview.Height - 64;
+            if (w < panelTexturePreview.Width) w = panelTexturePreview.Width;
+            if (h < panelTexturePreview.Height) h = panelTexturePreview.Height;
+            if (w < 128) w = 128;
+            if (h < 128) h = 128;
+            pictureBoxTexturePreview.Width = w;
+            pictureBoxTexturePreview.Height = h;
+            ClampPictureBoxPosition();
+        }
+
+        private void ClampPictureBoxPosition()
+        {
+            int x = pictureBoxTexturePreview.Left;
+            int y = pictureBoxTexturePreview.Top;
+            int maxX = pictureBoxTexturePreview.Width - panelTexturePreview.Width;
+            int maxY = pictureBoxTexturePreview.Height - panelTexturePreview.Height;
+            if (x > 0) x = 0;
+            if (x < -maxX) x = -maxX;
+            if (y > 0) y = 0;
+            if (y < -maxY) y = -maxY;
+            if (x != pictureBoxTexturePreview.Left || y != pictureBoxTexturePreview.Top)
+            {
+                pictureBoxTexturePreview.Left = x;
+                pictureBoxTexturePreview.Top = y;
+                // Reset delta base to prevent oscillation at boundary
+                _panStart = pictureBoxTexturePreview.PointToClient(Control.MousePosition);
+            }
+        }
+
+        private void pictureBoxTexturePreview_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (pictureBoxTexturePreview.Width > panelTexturePreview.Width ||
+                pictureBoxTexturePreview.Height > panelTexturePreview.Height)
+            {
+                _isPanning = true;
+                _panStart = e.Location;
+                pictureBoxTexturePreview.Cursor = Cursors.SizeAll;
+            }
+        }
+
+        private void pictureBoxTexturePreview_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!_isPanning) return;
+            int dx = e.X - _panStart.X;
+            int dy = e.Y - _panStart.Y;
+            if (dx == 0 && dy == 0) return;
+            pictureBoxTexturePreview.Left += dx;
+            pictureBoxTexturePreview.Top += dy;
+            ClampPictureBoxPosition();
+        }
+
+        private void pictureBoxTexturePreview_MouseUp(object sender, MouseEventArgs e)
+        {
+            _isPanning = false;
+            pictureBoxTexturePreview.Cursor = Cursors.Default;
         }
     }
 }

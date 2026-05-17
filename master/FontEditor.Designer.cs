@@ -128,6 +128,9 @@ namespace TTG_Tools
             this.buttonYoffsetDown = new System.Windows.Forms.Button();
             this.buttonYadjUp = new System.Windows.Forms.Button();
             this.buttonYadjDown = new System.Windows.Forms.Button();
+            this.btnZoomIn = new System.Windows.Forms.Button();
+            this.btnZoomOut = new System.Windows.Forms.Button();
+            this.panelTexturePreview = new System.Windows.Forms.Panel();
             this.labelYAdjust = new System.Windows.Forms.Label();
             this.textBoxYAdjust = new System.Windows.Forms.TextBox();
             this.buttonApplyYAdjust = new System.Windows.Forms.Button();
@@ -723,16 +726,26 @@ namespace TTG_Tools
             this.rbNoSwizzle.UseVisualStyleBackColor = true;
             this.rbNoSwizzle.CheckedChanged += new System.EventHandler(this.rbNoSwizzle_CheckedChanged);
             // 
+            // panelTexturePreview (viewport for panning)
+            // 
+            this.panelTexturePreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelTexturePreview.Location = new System.Drawing.Point(857, 347);
+            this.panelTexturePreview.Name = "panelTexturePreview";
+            this.panelTexturePreview.Size = new System.Drawing.Size(512, 512);
+            this.panelTexturePreview.TabIndex = 31;
+            // 
             // pictureBoxTexturePreview
             // 
             this.pictureBoxTexturePreview.BackColor = System.Drawing.Color.Black;
-            this.pictureBoxTexturePreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBoxTexturePreview.Location = new System.Drawing.Point(857, 347);
+            this.pictureBoxTexturePreview.Location = new System.Drawing.Point(0, 0);
             this.pictureBoxTexturePreview.Name = "pictureBoxTexturePreview";
             this.pictureBoxTexturePreview.Size = new System.Drawing.Size(512, 512);
             this.pictureBoxTexturePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBoxTexturePreview.TabIndex = 31;
+            this.pictureBoxTexturePreview.TabIndex = 0;
             this.pictureBoxTexturePreview.TabStop = false;
+            this.pictureBoxTexturePreview.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBoxTexturePreview_MouseDown);
+            this.pictureBoxTexturePreview.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBoxTexturePreview_MouseMove);
+            this.pictureBoxTexturePreview.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBoxTexturePreview_MouseUp);
             // 
             // labelTexturePreview
             // 
@@ -742,6 +755,26 @@ namespace TTG_Tools
             this.labelTexturePreview.Size = new System.Drawing.Size(143, 13);
             this.labelTexturePreview.TabIndex = 32;
             this.labelTexturePreview.Text = "Texture preview (read-only)";
+            // 
+            // btnZoomOut
+            // 
+            this.btnZoomOut.Location = new System.Drawing.Point(1000, 323);
+            this.btnZoomOut.Name = "btnZoomOut";
+            this.btnZoomOut.Size = new System.Drawing.Size(22, 22);
+            this.btnZoomOut.TabIndex = 32;
+            this.btnZoomOut.Text = "−";
+            this.btnZoomOut.UseVisualStyleBackColor = true;
+            this.btnZoomOut.Click += new System.EventHandler(this.btnZoomOut_Click);
+            // 
+            // btnZoomIn
+            // 
+            this.btnZoomIn.Location = new System.Drawing.Point(1024, 323);
+            this.btnZoomIn.Name = "btnZoomIn";
+            this.btnZoomIn.Size = new System.Drawing.Size(22, 22);
+            this.btnZoomIn.TabIndex = 33;
+            this.btnZoomIn.Text = "＋";
+            this.btnZoomIn.UseVisualStyleBackColor = true;
+            this.btnZoomIn.Click += new System.EventHandler(this.btnZoomIn_Click);
             // 
             // groupBoxMatchTextures
             // 
@@ -1177,7 +1210,10 @@ namespace TTG_Tools
             this.Controls.Add(this.groupBoxMatchTextures);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.labelTexturePreview);
-            this.Controls.Add(this.pictureBoxTexturePreview);
+            this.Controls.Add(this.btnZoomOut);
+            this.Controls.Add(this.btnZoomIn);
+            this.panelTexturePreview.Controls.Add(this.pictureBoxTexturePreview);
+            this.Controls.Add(this.panelTexturePreview);
             this.Controls.Add(this.dataGridViewWithCoord);
             this.Controls.Add(this.dataGridViewWithTextures);
             this.Controls.Add(this.groupBox2);
@@ -1258,6 +1294,9 @@ namespace TTG_Tools
         private System.Windows.Forms.RadioButton rbNoSwizzle;
         private System.Windows.Forms.PictureBox pictureBoxTexturePreview;
         private System.Windows.Forms.Label labelTexturePreview;
+        private System.Windows.Forms.Button btnZoomIn;
+        private System.Windows.Forms.Button btnZoomOut;
+        private System.Windows.Forms.Panel panelTexturePreview;
         private System.Windows.Forms.GroupBox groupBoxMatchTextures;
         private System.Windows.Forms.GroupBox groupBoxFntAdjust;
         private System.Windows.Forms.Button buttonDetectMissingTextures;
