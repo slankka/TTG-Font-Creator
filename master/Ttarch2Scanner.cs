@@ -49,9 +49,9 @@ namespace TTG_Tools
             cmbGameKey.Items.Clear();
             cmbGameKey.Items.Add("Auto-detect (try all keys)");
 
-            for (int i = 0; i < MainMenu.gamelist.Count; i++)
+            for (int i = 0; i < AppData.gamelist.Count; i++)
             {
-                cmbGameKey.Items.Add(i + ". " + MainMenu.gamelist[i].gamename);
+                cmbGameKey.Items.Add(i + ". " + AppData.gamelist[i].gamename);
             }
 
             cmbGameKey.SelectedIndex = 0;
@@ -153,9 +153,9 @@ namespace TTG_Tools
 
                 // 获取选中的游戏密钥
                 byte[] selectedKey = null;
-                if (cmbGameKey.SelectedIndex > 0 && cmbGameKey.SelectedIndex - 1 < MainMenu.gamelist.Count)
+                if (cmbGameKey.SelectedIndex > 0 && cmbGameKey.SelectedIndex - 1 < AppData.gamelist.Count)
                 {
-                    selectedKey = MainMenu.gamelist[cmbGameKey.SelectedIndex - 1].key;
+                    selectedKey = AppData.gamelist[cmbGameKey.SelectedIndex - 1].key;
                 }
 
                 // 并行扫描每个文件
@@ -240,7 +240,7 @@ namespace TTG_Tools
             byte[] key = providedKey;
 
             // 如果没有提供key但选择了Auto-detect，尝试所有key
-            if (key == null && cmbGameKey.SelectedIndex == 0 && MainMenu.gamelist.Count > 0)
+            if (key == null && cmbGameKey.SelectedIndex == 0 && AppData.gamelist.Count > 0)
             {
                 // 先尝试不使用key（未加密文件）
                 ArchiveInfo result = ReadTtarch2FileDirect(filePath, null);
@@ -250,7 +250,7 @@ namespace TTG_Tools
                 }
 
                 // 尝试每个key
-                foreach (var game in MainMenu.gamelist)
+                foreach (var game in AppData.gamelist)
                 {
                     result = ReadTtarch2FileDirect(filePath, game.key);
                     if (result != null)
@@ -1025,9 +1025,9 @@ namespace TTG_Tools
             {
                 // 获取游戏密钥
                 byte[] key = null;
-                if (cmbGameKey.SelectedIndex > 0 && cmbGameKey.SelectedIndex - 1 < MainMenu.gamelist.Count)
+                if (cmbGameKey.SelectedIndex > 0 && cmbGameKey.SelectedIndex - 1 < AppData.gamelist.Count)
                 {
-                    key = MainMenu.gamelist[cmbGameKey.SelectedIndex - 1].key;
+                    key = AppData.gamelist[cmbGameKey.SelectedIndex - 1].key;
                 }
 
                 // 异步读取文件内容
@@ -1498,7 +1498,7 @@ namespace TTG_Tools
                         int actorNameSize = br.ReadInt32();
                         tmp = br.ReadBytes(actorNameSize);
                         string actorName = Methods.DecodeGameText(tmp, isUnicode);
-                        if (MainMenu.settings.supportTwdNintendoSwitch && isUnicode)
+                        if (AppData.settings.supportTwdNintendoSwitch && isUnicode)
                         {
                             actorName = Methods.isUTF8String(tmp) ? Encoding.UTF8.GetString(tmp) : actorName;
                         }
@@ -1509,7 +1509,7 @@ namespace TTG_Tools
                         int actorSpeechSize = br.ReadInt32();
                         tmp = br.ReadBytes(actorSpeechSize);
                         string actorSpeech = Methods.DecodeGameText(tmp, isUnicode);
-                        if (MainMenu.settings.supportTwdNintendoSwitch && isUnicode)
+                        if (AppData.settings.supportTwdNintendoSwitch && isUnicode)
                         {
                             actorSpeech = Methods.isUTF8String(tmp) ? Encoding.UTF8.GetString(tmp) : actorSpeech;
                         }
@@ -1971,3 +1971,5 @@ namespace TTG_Tools
         }
     }
 }
+
+

@@ -14,19 +14,19 @@ namespace TTG_Tools
         static void Main()
         {
             string xmlPath = Application.StartupPath + "\\config.xml";
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
             if (File.Exists(xmlPath))
             {
                 FirstTime = false;
-
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new MainMenu());
+                AppData.LoadConfig();
+                Application.Run(new FontEditor());
             }
             else
             {
                 MessageBox.Show("Can't find config.xml!\r\nPlease set path for folders, save changes and restart the program!", "Error");
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new FormSettings());
             }
         }

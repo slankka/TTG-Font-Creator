@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.IO;
 using System.Linq;
@@ -223,12 +223,12 @@ namespace TTG_Tools
 
         private static bool UsesLegacy1132Ttarch2Builder(int selectedGameIndex)
         {
-            if (selectedGameIndex < 0 || selectedGameIndex >= MainMenu.gamelist.Count)
+            if (selectedGameIndex < 0 || selectedGameIndex >= AppData.gamelist.Count)
             {
                 return false;
             }
 
-            string gameName = MainMenu.gamelist[selectedGameIndex].gamename;
+            string gameName = AppData.gamelist[selectedGameIndex].gamename;
 
             return (gameName == "Sam & Max: Save the World - Remastered")
                 || (gameName == "Sam & Max: Beyond Time and Space - Remastered")
@@ -933,7 +933,7 @@ namespace TTG_Tools
                 if (versionArchive == 4 || versionArchive >= 7)
                 {
                     int priority = 0;
-                    int unknownValue = MainMenu.settings.oldXmode ? 1 : 0;
+                    int unknownValue = AppData.settings.oldXmode ? 1 : 0;
                     byte[] binChunkSize = BitConverter.GetBytes(headerChunkSize);
 
                     bw.Write(priority);
@@ -1075,9 +1075,9 @@ namespace TTG_Tools
             textBox1.DragEnter += ArchivePacker_DragEnter;
             textBox1.DragDrop += ArchivePacker_DragDrop;
 
-            for (int i = 0; i < MainMenu.gamelist.Count(); i++)
+            for (int i = 0; i < AppData.gamelist.Count(); i++)
             {
-                comboGameList.Items.Add(i + ". " + MainMenu.gamelist[i].gamename);
+                comboGameList.Items.Add(i + ". " + AppData.gamelist[i].gamename);
             }
 
             compressionCB.Items.Add("Deflate");
@@ -1085,28 +1085,28 @@ namespace TTG_Tools
             compressionCB.Items.Add("Oodle Kraken");
             compressionCB.SelectedIndex = 0;
             
-            newEngineLua.Checked = MainMenu.settings.encNewLua;
-            checkCompress.Checked = MainMenu.settings.compressArchive;
+            newEngineLua.Checked = AppData.settings.encNewLua;
+            checkCompress.Checked = AppData.settings.compressArchive;
             preserveLuaCheck.Checked = true;
-            checkXmode.Checked = MainMenu.settings.oldXmode;
-            DontEncLuaCheck.Checked = MainMenu.settings.encryptLuaInArchive;
-            EncryptIt.Checked = MainMenu.settings.encArchive;
-            if (MainMenu.settings.inputDirPath != "") textBox1.Text = MainMenu.settings.inputDirPath;
-            if (MainMenu.settings.archivePath != "") textBox2.Text = MainMenu.settings.archivePath;
+            checkXmode.Checked = AppData.settings.oldXmode;
+            DontEncLuaCheck.Checked = AppData.settings.encryptLuaInArchive;
+            EncryptIt.Checked = AppData.settings.encArchive;
+            if (AppData.settings.inputDirPath != "") textBox1.Text = AppData.settings.inputDirPath;
+            if (AppData.settings.archivePath != "") textBox2.Text = AppData.settings.archivePath;
 
-            textBox3.Enabled = MainMenu.settings.customKey;
-            int encKeyIndex = MainMenu.settings.versionArchiveIndex;
-            if (MainMenu.settings.archiveFormat == 0) ttarchRB.Checked = true;
+            textBox3.Enabled = AppData.settings.customKey;
+            int encKeyIndex = AppData.settings.versionArchiveIndex;
+            if (AppData.settings.archiveFormat == 0) ttarchRB.Checked = true;
             else ttarch2RB.Checked = true;
 
-            comboGameList.SelectedIndex = MainMenu.settings.encKeyIndex;
+            comboGameList.SelectedIndex = AppData.settings.encKeyIndex;
             versionSelection.SelectedIndex = encKeyIndex;
 
 
-            if (MainMenu.settings.customKey && Methods.stringToKey(MainMenu.settings.encCustomKey) != null)
+            if (AppData.settings.customKey && Methods.stringToKey(AppData.settings.encCustomKey) != null)
             {
-                CheckCustomKey.Checked = MainMenu.settings.customKey;
-                textBox3.Text = MainMenu.settings.encCustomKey;
+                CheckCustomKey.Checked = AppData.settings.customKey;
+                textBox3.Text = AppData.settings.encCustomKey;
             }
         }
 
@@ -1124,11 +1124,11 @@ namespace TTG_Tools
             versionSelection.SelectedIndex = 0;
 
             checkXmode.Visible = true;
-            checkXmode.Checked = MainMenu.settings.oldXmode;
+            checkXmode.Checked = AppData.settings.oldXmode;
             
-            MainMenu.settings.archiveFormat = 0;
-            MainMenu.settings.versionArchiveIndex = versionSelection.SelectedIndex;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.archiveFormat = 0;
+            AppData.settings.versionArchiveIndex = versionSelection.SelectedIndex;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void ttarch2RB_CheckedChanged(object sender, EventArgs e)
@@ -1140,9 +1140,9 @@ namespace TTG_Tools
 
             checkXmode.Visible = false;
 
-            MainMenu.settings.archiveFormat = 1;
-            MainMenu.settings.versionArchiveIndex = versionSelection.SelectedIndex;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.archiveFormat = 1;
+            AppData.settings.versionArchiveIndex = versionSelection.SelectedIndex;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -1151,8 +1151,8 @@ namespace TTG_Tools
             {
                 textBox1.Text = fbd.FileName;
 
-                MainMenu.settings.inputDirPath = textBox1.Text;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.inputDirPath = textBox1.Text;
+                Settings.SaveConfig(AppData.settings);
             }
             else
             {
@@ -1162,8 +1162,8 @@ namespace TTG_Tools
 
         private void textBox1_Leave(object sender, EventArgs e)
         {
-            MainMenu.settings.inputDirPath = textBox1.Text.Trim();
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.inputDirPath = textBox1.Text.Trim();
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -1175,8 +1175,8 @@ namespace TTG_Tools
                 {
                     textBox2.Text = sfd.FileName;
                     
-                    MainMenu.settings.archivePath = textBox2.Text;
-                    Settings.SaveConfig(MainMenu.settings);
+                    AppData.settings.archivePath = textBox2.Text;
+                    Settings.SaveConfig(AppData.settings);
                 }
                 else
                 {
@@ -1190,8 +1190,8 @@ namespace TTG_Tools
                 {
                     textBox2.Text = sfd.FileName;
 
-                    MainMenu.settings.archivePath = textBox2.Text;
-                    Settings.SaveConfig(MainMenu.settings);
+                    AppData.settings.archivePath = textBox2.Text;
+                    Settings.SaveConfig(AppData.settings);
                 }
                 else
                 {
@@ -1202,8 +1202,8 @@ namespace TTG_Tools
 
         private void textBox2_Leave(object sender, EventArgs e)
         {
-            MainMenu.settings.archivePath = textBox2.Text.Trim();
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.archivePath = textBox2.Text.Trim();
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void ArchivePacker_DragEnter(object sender, DragEventArgs e)
@@ -1247,8 +1247,8 @@ namespace TTG_Tools
             if (Directory.Exists(droppedPath))
             {
                 textBox1.Text = droppedPath;
-                MainMenu.settings.inputDirPath = droppedPath.Trim();
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.inputDirPath = droppedPath.Trim();
+                Settings.SaveConfig(AppData.settings);
                 return;
             }
 
@@ -1258,16 +1258,16 @@ namespace TTG_Tools
             if ((ext == ".ttarch") || (ext == ".ttarch2") || (ext == ".obb"))
             {
                 textBox2.Text = droppedPath;
-                MainMenu.settings.archivePath = droppedPath.Trim();
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.archivePath = droppedPath.Trim();
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
         private async void buildButton_Click(object sender, EventArgs e)
         {
-            if ((MainMenu.settings.inputDirPath != "") && (MainMenu.settings.archivePath != ""))
+            if ((AppData.settings.inputDirPath != "") && (AppData.settings.archivePath != ""))
             {
-                DirectoryInfo checkDI = new DirectoryInfo(MainMenu.settings.inputDirPath);
+                DirectoryInfo checkDI = new DirectoryInfo(AppData.settings.inputDirPath);
                 if (checkDI.Exists)
                 {
                     string example = "96CA99A085CF988AE4DBE2CDA6968388C08B99E39ED89BB6D790DCBEAD9D9165B6A69EBBC2C69EB3E7E3E5D5AB6382A09CC4929FD1D5A4";
@@ -1276,14 +1276,14 @@ namespace TTG_Tools
 
                     byte[] keyEnc;
                     if(CheckCustomKey.Checked) keyEnc = Methods.stringToKey(textBox3.Text);
-                    else keyEnc = MainMenu.gamelist[comboGameList.SelectedIndex].key;
+                    else keyEnc = AppData.gamelist[comboGameList.SelectedIndex].key;
                     
-                    if((keyEnc == null) && (MainMenu.settings.encArchive || !MainMenu.settings.encryptLuaInArchive))
+                    if((keyEnc == null) && (AppData.settings.encArchive || !AppData.settings.encryptLuaInArchive))
                     {
                         if (!CheckCustomKey.Checked)
                         {
-                            MainMenu.settings.encArchive = false;
-                            MainMenu.settings.encryptLuaInArchive = true;
+                            AppData.settings.encArchive = false;
+                            AppData.settings.encryptLuaInArchive = true;
                         }
                         else
                         {
@@ -1292,7 +1292,7 @@ namespace TTG_Tools
                         }
                     }
 
-                    if (Methods.GetExtension(MainMenu.settings.archivePath).ToLower() == ".obb") MainMenu.settings.compressArchive = false;
+                    if (Methods.GetExtension(AppData.settings.archivePath).ToLower() == ".obb") AppData.settings.compressArchive = false;
 
                     int algorithmCompress = 0;
 
@@ -1305,7 +1305,7 @@ namespace TTG_Tools
 
                     if(ttarchRB.Checked)
                     {
-                        await Task.Run(() => ttarchBuilder(MainMenu.settings.inputDirPath, MainMenu.settings.archivePath, keyEnc, MainMenu.settings.compressArchive, archiveVersion, MainMenu.settings.encArchive, MainMenu.settings.encryptLuaInArchive, algorithmCompress, preserveLuaCheck.Checked, checkPaddingCompat.Checked));
+                        await Task.Run(() => ttarchBuilder(AppData.settings.inputDirPath, AppData.settings.archivePath, keyEnc, AppData.settings.compressArchive, archiveVersion, AppData.settings.encArchive, AppData.settings.encryptLuaInArchive, algorithmCompress, preserveLuaCheck.Checked, checkPaddingCompat.Checked));
                     }
                     else
                     {
@@ -1313,16 +1313,16 @@ namespace TTG_Tools
 
                         if (useLegacyBuilder)
                         {
-                            await Task.Run(() => ttarch2BuilderLegacy1132(MainMenu.settings.inputDirPath, MainMenu.settings.archivePath, MainMenu.settings.compressArchive, MainMenu.settings.encArchive, !MainMenu.settings.encryptLuaInArchive, keyEnc, archiveVersion, MainMenu.settings.encNewLua, preserveLuaCheck.Checked, checkPaddingCompat.Checked));
+                            await Task.Run(() => ttarch2BuilderLegacy1132(AppData.settings.inputDirPath, AppData.settings.archivePath, AppData.settings.compressArchive, AppData.settings.encArchive, !AppData.settings.encryptLuaInArchive, keyEnc, archiveVersion, AppData.settings.encNewLua, preserveLuaCheck.Checked, checkPaddingCompat.Checked));
                         }
                         else
                         {
-                            await Task.Run(() => ttarch2Builder(MainMenu.settings.inputDirPath, MainMenu.settings.archivePath, MainMenu.settings.compressArchive, MainMenu.settings.encArchive, !MainMenu.settings.encryptLuaInArchive, keyEnc, archiveVersion, MainMenu.settings.encNewLua, algorithmCompress, preserveLuaCheck.Checked, checkPaddingCompat.Checked));
+                            await Task.Run(() => ttarch2Builder(AppData.settings.inputDirPath, AppData.settings.archivePath, AppData.settings.compressArchive, AppData.settings.encArchive, !AppData.settings.encryptLuaInArchive, keyEnc, archiveVersion, AppData.settings.encNewLua, algorithmCompress, preserveLuaCheck.Checked, checkPaddingCompat.Checked));
                         }
                     }
 
-                    /*if (ttarchRB.Checked == true) ttarchBuilder(MainMenu.settings.inputDirPath, MainMenu.settings.archivePath, keyEnc, MainMenu.settings.compressArchive, archiveVersion, MainMenu.settings.encArchive, MainMenu.settings.encryptLuaInArchive, algorithmCompress);
-                    else builder_ttarch2(MainMenu.settings.inputDirPath, MainMenu.settings.archivePath, MainMenu.settings.compressArchive, MainMenu.settings.encArchive, !MainMenu.settings.encryptLuaInArchive, keyEnc, archiveVersion, MainMenu.settings.encNewLua, algorithmCompress);*/
+                    /*if (ttarchRB.Checked == true) ttarchBuilder(AppData.settings.inputDirPath, AppData.settings.archivePath, keyEnc, AppData.settings.compressArchive, archiveVersion, AppData.settings.encArchive, AppData.settings.encryptLuaInArchive, algorithmCompress);
+                    else builder_ttarch2(AppData.settings.inputDirPath, AppData.settings.archivePath, AppData.settings.compressArchive, AppData.settings.encArchive, !AppData.settings.encryptLuaInArchive, keyEnc, archiveVersion, AppData.settings.encNewLua, algorithmCompress);*/
                 }
                 else MessageBox.Show("This folder doesn't exist!", "Error");
                 
@@ -1337,26 +1337,26 @@ namespace TTG_Tools
 
         private void comboGameList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.encKeyIndex = comboGameList.SelectedIndex;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.encKeyIndex = comboGameList.SelectedIndex;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void newEngineLua_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.encNewLua = newEngineLua.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.encNewLua = newEngineLua.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void CheckCustomKey_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.customKey = CheckCustomKey.Checked;
-            textBox3.Enabled = MainMenu.settings.customKey;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.customKey = CheckCustomKey.Checked;
+            textBox3.Enabled = AppData.settings.customKey;
+            Settings.SaveConfig(AppData.settings);
 
-            if ((MainMenu.settings.customKey == true) &&
-               ((MainMenu.settings.encCustomKey != "") && (MainMenu.settings.encCustomKey != null)))
+            if ((AppData.settings.customKey == true) &&
+               ((AppData.settings.encCustomKey != "") && (AppData.settings.encCustomKey != null)))
             {
-                textBox3.Text = MainMenu.settings.encCustomKey;
+                textBox3.Text = AppData.settings.encCustomKey;
             }
             else
             {
@@ -1366,20 +1366,20 @@ namespace TTG_Tools
 
         private void DontEncLuaCheck_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.encryptLuaInArchive = DontEncLuaCheck.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.encryptLuaInArchive = DontEncLuaCheck.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void EncryptIt_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.encArchive = EncryptIt.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.encArchive = EncryptIt.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void checkCompress_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.compressArchive = checkCompress.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.compressArchive = checkCompress.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void preserveLuaCheck_CheckedChanged(object sender, EventArgs e)
@@ -1388,8 +1388,8 @@ namespace TTG_Tools
 
         private void checkXmode_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.oldXmode = checkXmode.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.oldXmode = checkXmode.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void versionSelection_SelectedIndexChanged(object sender, EventArgs e)
@@ -1423,8 +1423,10 @@ namespace TTG_Tools
                 checkXmode.Visible = false;
             }
 
-            MainMenu.settings.versionArchiveIndex = versionSelection.SelectedIndex;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.versionArchiveIndex = versionSelection.SelectedIndex;
+            Settings.SaveConfig(AppData.settings);
         }
     }
 }
+
+

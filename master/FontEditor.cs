@@ -112,5 +112,41 @@ namespace TTG_Tools
         {
 
         }
+
+        private void archivePackerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Application.OpenForms.OfType<ArchivePacker>().Count() == 0)
+            {
+                Form archiveForm = new ArchivePacker();
+                archiveForm.Show();
+            }
+        }
+
+        private void archiveUnpackerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Application.OpenForms.OfType<ArchiveUnpacker>().Count() == 0)
+            {
+                Form arcUnpackerForm = new ArchiveUnpacker();
+                arcUnpackerForm.Show();
+            }
+        }
+
+        private void settingsFormToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Application.OpenForms.OfType<FormSettings>().Count() == 0)
+            {
+                Form settings = new FormSettings();
+                settings.Show();
+            }
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Application.OpenForms.OfType<About>().Count() == 0)
+            {
+                Form about = new About();
+                about.Show();
+            }
+        }
     }
 }

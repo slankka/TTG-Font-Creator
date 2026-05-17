@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,7 +45,7 @@ namespace TTG_Tools
 
                 if (progressBar1.Value > 0) progressBar1.Value = 0;
 
-                byte[] key = MainMenu.gamelist[gameListCB.SelectedIndex].key;
+                byte[] key = AppData.gamelist[gameListCB.SelectedIndex].key;
 
                 switch (fi.Extension.ToLower())
                 {
@@ -490,7 +490,7 @@ namespace TTG_Tools
                         {
                             int nameLen = mbr.ReadInt32();
                             byte[] tmpName = mbr.ReadBytes(nameLen);
-                            string name = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmpName);
+                            string name = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmpName);
                         }
 
                         int filesCount = mbr.ReadInt32();
@@ -501,7 +501,7 @@ namespace TTG_Tools
                         {
                             int nameLen = mbr.ReadInt32();
                             byte[] tmpName = mbr.ReadBytes(nameLen);
-                            ttarch.files[f].fileName = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmpName);
+                            ttarch.files[f].fileName = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmpName);
                             int zeroVal = mbr.ReadInt32(); //always shows 0 value
                             ttarch.files[f].fileOffset = mbr.ReadUInt32();
                             ttarch.files[f].fileSize = mbr.ReadInt32();
@@ -1384,14 +1384,14 @@ namespace TTG_Tools
 
         private void ArchiveUnpacker_Load(object sender, EventArgs e)
         {
-            for (int i = 0; i < MainMenu.gamelist.Count; i++)
+            for (int i = 0; i < AppData.gamelist.Count; i++)
             {
-                gameListCB.Items.Add(i + ". " + MainMenu.gamelist[i].gamename);
+                gameListCB.Items.Add(i + ". " + AppData.gamelist[i].gamename);
             }
 
-            gameListCB.SelectedIndex = MainMenu.settings.encKeyIndex;
-            customKeyTB.Text = MainMenu.settings.encCustomKey;
-            useCustomKeyCB.Checked = MainMenu.settings.customKey;
+            gameListCB.SelectedIndex = AppData.settings.encKeyIndex;
+            customKeyTB.Text = AppData.settings.encCustomKey;
+            useCustomKeyCB.Checked = AppData.settings.customKey;
 
             searchTB.Enabled = searchFilesByNameCB.Checked;
             searchBtn.Enabled = searchFilesByNameCB.Checked;
@@ -1402,7 +1402,7 @@ namespace TTG_Tools
         private async void unpackToolStripMenuItem_Click(object sender, EventArgs e)
         {
             decrypt = decryptLuaCB.Checked;
-            key = MainMenu.gamelist[gameListCB.SelectedIndex].key;
+            key = AppData.gamelist[gameListCB.SelectedIndex].key;
             string format = fileFormatsCB.Text;
             string searchPattern = isSearchEnabled() ? searchTB.Text.ToLower() : null;
 
@@ -1443,18 +1443,18 @@ namespace TTG_Tools
 
         private void gameListCB_SelectedIndexChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.encKeyIndex = gameListCB.SelectedIndex;
+            AppData.settings.encKeyIndex = gameListCB.SelectedIndex;
 
-            Settings.SaveConfig(MainMenu.settings);
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void useCustomKeyCB_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.customKey = useCustomKeyCB.Checked;
+            AppData.settings.customKey = useCustomKeyCB.Checked;
 
-            MainMenu.settings.encCustomKey = customKeyTB.Text != "" ? customKeyTB.Text : MainMenu.settings.encCustomKey;
+            AppData.settings.encCustomKey = customKeyTB.Text != "" ? customKeyTB.Text : AppData.settings.encCustomKey;
 
-            Settings.SaveConfig(MainMenu.settings);
+            Settings.SaveConfig(AppData.settings);
         }
 
         private async void unpackSelectedToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1467,7 +1467,7 @@ namespace TTG_Tools
 
             if (filesDataGridView.SelectedRows.Count > 0)
             {
-                key = MainMenu.gamelist[gameListCB.SelectedIndex].key;
+                key = AppData.gamelist[gameListCB.SelectedIndex].key;
                 decrypt = decryptLuaCB.Checked;
 
                 string format = fileFormatsCB.Text;
@@ -1572,3 +1572,5 @@ namespace TTG_Tools
         }
     }
 }
+
+

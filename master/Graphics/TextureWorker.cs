@@ -5,6 +5,7 @@ using TTG_Tools.Graphics.DDS;
 using TTG_Tools.Graphics.PVR;
 using TTG_Tools.Graphics.Swizzles;
 using System.Linq;
+using TTG_Tools;
 
 namespace TTG_Tools.Graphics
 {
@@ -890,7 +891,7 @@ namespace TTG_Tools.Graphics
             FileInfo fi = new FileInfo(InputFile);
 
             string ext = fi.Extension.ToLowerInvariant();
-            if (MainMenu.settings.swizzleNintendoWii && (ext == ".d3dtx" || ext == ".font"))
+            if (AppData.settings.swizzleNintendoWii && (ext == ".d3dtx" || ext == ".font"))
             {
                 string wiiResult;
                 if (extract && WiiSupport.TryExtractWiiContainer(InputFile, OutputDir, out wiiResult))
@@ -1236,10 +1237,10 @@ namespace TTG_Tools.Graphics
                     if (Encoding.ASCII.GetString(check_header) == "ERTM") res = ReplaceNewTextures(ms, mode, Encoding.ASCII.GetString(check_header), tex, false);
                     else
                     {
-                        if (MainMenu.settings.swizzleNintendoSwitch) tex.platform.platform = 15;
-                        if (MainMenu.settings.swizzlePS4) tex.platform.platform = 11;
-                        if (MainMenu.settings.swizzleXbox360) tex.platform.platform = 4;
-                        if (MainMenu.settings.swizzlePSVita) tex.platform.platform = 9;
+                        if (AppData.settings.swizzleNintendoSwitch) tex.platform.platform = 15;
+                        if (AppData.settings.swizzlePS4) tex.platform.platform = 11;
+                        if (AppData.settings.swizzleXbox360) tex.platform.platform = 4;
+                        if (AppData.settings.swizzlePSVita) tex.platform.platform = 9;
 
                         for(mode = 2; mode < 4; mode++)
                         {
@@ -1258,8 +1259,8 @@ namespace TTG_Tools.Graphics
 
                     if (res == -1) return "Unsupported format";
 
-                    if (File.Exists(MainMenu.settings.pathForOutputFolder + "\\" + fi.Name)) File.Delete(MainMenu.settings.pathForOutputFolder + "\\" + fi.Name);
-                    FileStream fs = new FileStream(MainMenu.settings.pathForOutputFolder + "\\" + fi.Name, FileMode.CreateNew);
+                    if (File.Exists(AppData.settings.pathForOutputFolder + "\\" + fi.Name)) File.Delete(AppData.settings.pathForOutputFolder + "\\" + fi.Name);
+                    FileStream fs = new FileStream(AppData.settings.pathForOutputFolder + "\\" + fi.Name, FileMode.CreateNew);
                     fs.Write(NewContent, 0, NewContent.Length);
                     fs.Close();
                     
@@ -2848,3 +2849,5 @@ namespace TTG_Tools.Graphics
         }
     }
 }
+
+

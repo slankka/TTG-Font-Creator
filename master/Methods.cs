@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
@@ -98,7 +98,7 @@ namespace TTG_Tools
             if (!_normalizeImportTextForCurrentOperation) return stats;
             if (texts == null || texts.Count == 0) return stats;
 
-            bool enableReplace = MainMenu.settings.enableImportTextReplace;
+            bool enableReplace = AppData.settings.enableImportTextReplace;
             List<ImportTextReplaceRule> activeRules = GetActiveImportReplaceRules();
 
             for (int i = 0; i < texts.Count; i++)
@@ -167,7 +167,7 @@ namespace TTG_Tools
             // game text encoding; otherwise game may show trailing 'n' without wrapping.
             string result = ConvertLiteralNewlineMarkers(text);
 
-            if (MainMenu.settings.normalizePunctuationBeforeNewlineInImport)
+            if (AppData.settings.normalizePunctuationBeforeNewlineInImport)
             {
                 // Normalize punctuation so line breaks occur after sentence-ending marks,
                 // not before them. Example: "... \n。" -> "... 。\n".
@@ -176,12 +176,12 @@ namespace TTG_Tools
 
             if (!ContainsCjkCharacters(result)) return result;
 
-            if (MainMenu.settings.removeBlanksBetweenCjkCharsInImport)
+            if (AppData.settings.removeBlanksBetweenCjkCharsInImport)
             {
                 result = TransformOutsideMarkers(result, RemoveWhitespacesBetweenCjkCharacters);
             }
 
-            if (MainMenu.settings.replaceDotToChinesePeriodInImport)
+            if (AppData.settings.replaceDotToChinesePeriodInImport)
             {
                 result = TransformOutsideMarkers(result, ReplaceDotsNearCjkWithChinesePeriod);
             }
@@ -203,7 +203,7 @@ namespace TTG_Tools
         private static string ApplyAutoSubtitleWrapAfterReplace(string text)
         {
             if (String.IsNullOrEmpty(text)) return text;
-            if (!MainMenu.settings.autoInsertSubtitleNewlineInImport) return text;
+            if (!AppData.settings.autoInsertSubtitleNewlineInImport) return text;
             if (!ContainsCjkCharacters(text)) return text;
 
             return AutoInsertSubtitleNewlineMarkers(text);
@@ -218,13 +218,13 @@ namespace TTG_Tools
         {
             List<ImportTextReplaceRule> result = new List<ImportTextReplaceRule>();
 
-            if (MainMenu.settings == null) return result;
+            if (AppData.settings == null) return result;
 
-            if (MainMenu.settings.importTextReplaceRules != null && MainMenu.settings.importTextReplaceRules.Count > 0)
+            if (AppData.settings.importTextReplaceRules != null && AppData.settings.importTextReplaceRules.Count > 0)
             {
-                for (int i = 0; i < MainMenu.settings.importTextReplaceRules.Count; i++)
+                for (int i = 0; i < AppData.settings.importTextReplaceRules.Count; i++)
                 {
-                    ImportTextReplaceRule rule = MainMenu.settings.importTextReplaceRules[i];
+                    ImportTextReplaceRule rule = AppData.settings.importTextReplaceRules[i];
                     if (rule == null) continue;
 
                     string find = rule.find ?? "";
@@ -242,14 +242,14 @@ namespace TTG_Tools
             }
 
             // Backward compatibility: legacy single find/replace settings.
-            string legacyFind = MainMenu.settings.importTextReplaceFind ?? "";
+            string legacyFind = AppData.settings.importTextReplaceFind ?? "";
             if (legacyFind.Length > 0)
             {
                 result.Add(new ImportTextReplaceRule
                 {
                     enabled = true,
                     find = legacyFind,
-                    replaceWith = MainMenu.settings.importTextReplaceWith ?? ""
+                    replaceWith = AppData.settings.importTextReplaceWith ?? ""
                 });
             }
 
@@ -686,7 +686,7 @@ namespace TTG_Tools
 
         public static bool ShouldUseUtf8ForPropReinsert(string fileName, bool headerIs6VSM)
         {
-            if (MainMenu.settings.supportTwdNintendoSwitch)
+            if (AppData.settings.supportTwdNintendoSwitch)
             {
                 // Switch mode: all PROP reinsertion in UTF-8.
                 return true;
@@ -697,7 +697,7 @@ namespace TTG_Tools
 
         public static bool ShouldForceAnsiForSeasonStatsPropLine(string fileName, string text)
         {
-            if (!MainMenu.settings.supportTwdNintendoSwitch) return false;
+            if (!AppData.settings.supportTwdNintendoSwitch) return false;
 
             string safeName = Path.GetFileName(fileName ?? "");
             if (!safeName.Equals("seasonStatsText.prop", StringComparison.OrdinalIgnoreCase)) return false;
@@ -710,7 +710,7 @@ namespace TTG_Tools
 
         public static bool IsLandbExcludedFromTwdSwitchAnsi(string fileName)
         {
-            if (!MainMenu.settings.supportTwdNintendoSwitch) return false;
+            if (!AppData.settings.supportTwdNintendoSwitch) return false;
 
             string safeName = Path.GetFileName(fileName ?? "");
 
@@ -719,7 +719,7 @@ namespace TTG_Tools
 
         public static bool ShouldMapOpeningCreditsReplacement(string fileName, byte[] originalFileBytes)
         {
-            if (!MainMenu.settings.supportTwdNintendoSwitch) return false;
+            if (!AppData.settings.supportTwdNintendoSwitch) return false;
 
             string safeName = Path.GetFileName(fileName ?? "");
 
@@ -751,8 +751,8 @@ namespace TTG_Tools
 
         public static int GetActiveTextCodePage()
         {
-            int codePage = MainMenu.settings.ASCII_N;
-            if (MainMenu.settings.supportTwdNintendoSwitch)
+            int codePage = AppData.settings.ASCII_N;
+            if (AppData.settings.supportTwdNintendoSwitch)
             {
                 codePage = 1252;
             }
@@ -815,7 +815,7 @@ namespace TTG_Tools
 
         public static bool ShouldForceUtf8ForLandbString(string fileName, string text, bool openingCreditsReplacementMode)
         {
-            if (!MainMenu.settings.supportTwdNintendoSwitch) return false;
+            if (!AppData.settings.supportTwdNintendoSwitch) return false;
             if (String.IsNullOrEmpty(text)) return false;
 
             if (ContainsJapaneseCharacters(text)) return true;
@@ -857,7 +857,7 @@ namespace TTG_Tools
 
         public static bool ShouldUseTwdNintendoSwitchAnsi(string versionOfGame)
         {
-            if (!MainMenu.settings.supportTwdNintendoSwitch) return false;
+            if (!AppData.settings.supportTwdNintendoSwitch) return false;
             if (String.IsNullOrEmpty(versionOfGame)) return false;
 
             return versionOfGame == "The Walking Dead: Season One"
@@ -924,8 +924,8 @@ namespace TTG_Tools
         public static string ConvertString(string str, bool exportString)
         {
             byte[] tmpVal = Encoding.UTF8.GetBytes(str);
-            tmpVal = exportString ? Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding(1252), tmpVal) : Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding(MainMenu.settings.ASCII_N), tmpVal);
-            tmpVal = exportString ? Encoding.Convert(Encoding.GetEncoding(MainMenu.settings.ASCII_N), Encoding.UTF8, tmpVal) : Encoding.Convert(Encoding.GetEncoding(1252), Encoding.UTF8, tmpVal);
+            tmpVal = exportString ? Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding(1252), tmpVal) : Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding(AppData.settings.ASCII_N), tmpVal);
+            tmpVal = exportString ? Encoding.Convert(Encoding.GetEncoding(AppData.settings.ASCII_N), Encoding.UTF8, tmpVal) : Encoding.Convert(Encoding.GetEncoding(1252), Encoding.UTF8, tmpVal);
             str = Encoding.UTF8.GetString(tmpVal);
 
             return str;
@@ -1194,14 +1194,14 @@ namespace TTG_Tools
                     }
                 }
 
-                for (int a = 0; a < MainMenu.gamelist.Count; a++)
+                for (int a = 0; a < AppData.gamelist.Count; a++)
                 {
                     byte[] CheckVerOld = CheckVersion; //Old encryption method (for versions 2-6)
                     byte[] tempFileOld = new byte[bytes.Length]; //A temporary file for old encryption method
                     byte[] CheckVerNew = CheckVersion; //Newer encryption method (for versions 7-9)
                     byte[] tempFileNew = new byte[bytes.Length]; //A temporary file for newer encryption method
 
-                    decKey = MainMenu.gamelist[a].key;
+                    decKey = AppData.gamelist[a].key;
 
                     Array.Copy(bytes, 0, tempFileOld, 0, bytes.Length);
                     Array.Copy(bytes, 0, tempFileNew, 0, bytes.Length);
@@ -1241,8 +1241,8 @@ namespace TTG_Tools
                             }
                         }
 
-                        result = "Decryption key: " + MainMenu.gamelist[a].gamename + ". Blowfish type: old (versions 2-6)";
-                        KeyEnc = MainMenu.gamelist[a].key;
+                        result = "Decryption key: " + AppData.gamelist[a].gamename + ". Blowfish type: old (versions 2-6)";
+                        KeyEnc = AppData.gamelist[a].key;
                         version = 2;
                         break;
                     }
@@ -1270,8 +1270,8 @@ namespace TTG_Tools
                             }
                         }
 
-                        result = "Decryption key: " + MainMenu.gamelist[a].gamename + ". Blowfish type: new (versions 7-9)";
-                        KeyEnc = MainMenu.gamelist[a].key;
+                        result = "Decryption key: " + AppData.gamelist[a].gamename + ". Blowfish type: new (versions 7-9)";
+                        KeyEnc = AppData.gamelist[a].key;
                         version = 7;
                         break;
                     }
@@ -1317,9 +1317,9 @@ namespace TTG_Tools
                         if (TypeFile == "texture") DDSstart = FindStartOfStringSomething(bytes, 4, ".d3dtx") + 6;
                         else DDSstart = FindStartOfStringSomething(bytes, 4, ".tga") + 4;
 
-                        for (int i = 0; i < MainMenu.gamelist.Count; i++)
+                        for (int i = 0; i < AppData.gamelist.Count; i++)
                         {
-                            int DDSPos2 = meta_find_encrypted(bytes, "DDS ", DDSstart, MainMenu.gamelist[i].key, 2);
+                            int DDSPos2 = meta_find_encrypted(bytes, "DDS ", DDSstart, AppData.gamelist[i].key, 2);
 
                             if ((DDSPos2 != -1) && (DDSPos2 < (bytes.Length - 100)))
                             {
@@ -1327,19 +1327,19 @@ namespace TTG_Tools
                                 if (tempHeader.Length > bytes.Length - DDSPos2) tempHeader = new byte[bytes.Length - DDSPos2];
 
                                 Array.Copy(bytes, DDSPos2, tempHeader, 0, tempHeader.Length);
-                                BlowFishCS.BlowFish decHeader = new BlowFishCS.BlowFish(MainMenu.gamelist[i].key, 2);
+                                BlowFishCS.BlowFish decHeader = new BlowFishCS.BlowFish(AppData.gamelist[i].key, 2);
                                 tempHeader = decHeader.Crypt_ECB(tempHeader, 2, true);
                                 Array.Copy(tempHeader, 0, bytes, DDSPos2, tempHeader.Length);
                                 DDSstart = DDSPos2;
 
-                                result = "Decryption key: " + MainMenu.gamelist[i].gamename + ". Blowfish type: old (versions 2-6)";
-                                KeyEnc = MainMenu.gamelist[i].key;
+                                result = "Decryption key: " + AppData.gamelist[i].gamename + ". Blowfish type: old (versions 2-6)";
+                                KeyEnc = AppData.gamelist[i].key;
                                 version = 2;
 
                                 break;
                             }
 
-                            int DDSPos7 = meta_find_encrypted(bytes, "DDS ", DDSstart, MainMenu.gamelist[i].key, 7);
+                            int DDSPos7 = meta_find_encrypted(bytes, "DDS ", DDSstart, AppData.gamelist[i].key, 7);
 
                             if ((DDSPos7 != -1) && (DDSPos7 < (bytes.Length - 100)))
                             {
@@ -1347,13 +1347,13 @@ namespace TTG_Tools
                                 if (tempHeader.Length > bytes.Length - DDSPos7) tempHeader = new byte[bytes.Length - DDSPos7];
 
                                 Array.Copy(bytes, DDSPos7, tempHeader, 0, tempHeader.Length);
-                                BlowFishCS.BlowFish decHeader = new BlowFishCS.BlowFish(MainMenu.gamelist[i].key, 7);
+                                BlowFishCS.BlowFish decHeader = new BlowFishCS.BlowFish(AppData.gamelist[i].key, 7);
                                 tempHeader = decHeader.Crypt_ECB(tempHeader, 7, true);
                                 Array.Copy(tempHeader, 0, bytes, DDSPos7, tempHeader.Length);
                                 DDSstart = DDSPos7;
 
-                                result = "Decryption key: " + MainMenu.gamelist[i].gamename + ". Blowfish type: new (versions 7-9)";
-                                KeyEnc = MainMenu.gamelist[i].key;
+                                result = "Decryption key: " + AppData.gamelist[i].gamename + ". Blowfish type: new (versions 7-9)";
+                                KeyEnc = AppData.gamelist[i].key;
                                 version = 7;
 
                                 break;
@@ -1414,10 +1414,10 @@ namespace TTG_Tools
         public static int FindStartOfStringSomething(byte[] array, int offset, string string_something)
         {
             int poz = offset;
-            while (Methods.ConvertHexToString(array, poz, string_something.Length, MainMenu.settings.ASCII_N, 1) != string_something)
+            while (Methods.ConvertHexToString(array, poz, string_something.Length, AppData.settings.ASCII_N, 1) != string_something)
             {
                 poz++;
-                if (Methods.ConvertHexToString(array, poz, string_something.Length, MainMenu.settings.ASCII_N, 1) == string_something)
+                if (Methods.ConvertHexToString(array, poz, string_something.Length, AppData.settings.ASCII_N, 1) == string_something)
                 {
                     return poz;
                 }
@@ -1496,10 +1496,10 @@ namespace TTG_Tools
                 byte[] checkBuffer = decBuf.Crypt_ECB(buffer, version, true);
 
                 int bfPos = 0; //position at blowfished block
-                while (Methods.ConvertHexToString(checkBuffer, bfPos, NeedData.Length, MainMenu.settings.ASCII_N, 1) != NeedData)
+                while (Methods.ConvertHexToString(checkBuffer, bfPos, NeedData.Length, AppData.settings.ASCII_N, 1) != NeedData)
                 {
                     bfPos++;
-                    if (Methods.ConvertHexToString(checkBuffer, bfPos, NeedData.Length, MainMenu.settings.ASCII_N, 1) == NeedData)
+                    if (Methods.ConvertHexToString(checkBuffer, bfPos, NeedData.Length, AppData.settings.ASCII_N, 1) == NeedData)
                     {
                        result = bfPos + pos - 1;
                        IsFinding = false;
@@ -1555,15 +1555,15 @@ namespace TTG_Tools
             byte[] tmpFile = new byte[file.Length];
             Array.Copy(file, 0, tmpFile, 0, tmpFile.Length);
 
-            for(int i = 0; i < MainMenu.gamelist.Count; i++)
+            for(int i = 0; i < AppData.gamelist.Count; i++)
             {
-                int checkVer2 = meta_find_langres_crypt(ref tmpFile, MainMenu.gamelist[i].key, 2);
-                int checkVer7 = meta_find_langres_crypt(ref tmpFile, MainMenu.gamelist[i].key, 7);
+                int checkVer2 = meta_find_langres_crypt(ref tmpFile, AppData.gamelist[i].key, 2);
+                int checkVer7 = meta_find_langres_crypt(ref tmpFile, AppData.gamelist[i].key, 7);
 
                 if((checkVer2 != -1) || (checkVer7 != -1))
                 {
-                    result = "Encryption key " + MainMenu.gamelist[i].gamename + ". Version ";
-                    key = MainMenu.gamelist[i].key;
+                    result = "Encryption key " + AppData.gamelist[i].gamename + ". Version ";
+                    key = AppData.gamelist[i].key;
                     version = checkVer2 != -1 ? 2 : 7;
                     result += checkVer2 != -1 ? "(2-6)." : "(7-9).";
 
@@ -1849,3 +1849,5 @@ namespace TTG_Tools
         }
     }
 }
+
+

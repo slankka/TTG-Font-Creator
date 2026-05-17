@@ -51,6 +51,13 @@
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.archivePackerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.archiveUnpackerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsFormToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataGridViewWithTextures = new System.Windows.Forms.DataGridView();
             this.N = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Height = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -270,7 +277,10 @@
             // 
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.toolsToolStripMenuItem,
+            this.settingsToolStripMenuItem,
+            this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
@@ -290,6 +300,59 @@
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(39, 21);
             this.fileToolStripMenuItem.Text = "File";
+            // 
+            // toolsToolStripMenuItem
+            // 
+            this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.archivePackerToolStripMenuItem,
+            this.archiveUnpackerToolStripMenuItem});
+            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 21);
+            this.toolsToolStripMenuItem.Text = "Tools";
+            // 
+            // archivePackerToolStripMenuItem
+            // 
+            this.archivePackerToolStripMenuItem.Name = "archivePackerToolStripMenuItem";
+            this.archivePackerToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.archivePackerToolStripMenuItem.Text = "Archive Packer";
+            this.archivePackerToolStripMenuItem.Click += new System.EventHandler(this.archivePackerToolStripMenuItem_Click);
+            // 
+            // archiveUnpackerToolStripMenuItem
+            // 
+            this.archiveUnpackerToolStripMenuItem.Name = "archiveUnpackerToolStripMenuItem";
+            this.archiveUnpackerToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.archiveUnpackerToolStripMenuItem.Text = "Archive Unpacker";
+            this.archiveUnpackerToolStripMenuItem.Click += new System.EventHandler(this.archiveUnpackerToolStripMenuItem_Click);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.settingsFormToolStripMenuItem});
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 21);
+            this.settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // settingsFormToolStripMenuItem
+            // 
+            this.settingsFormToolStripMenuItem.Name = "settingsFormToolStripMenuItem";
+            this.settingsFormToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.settingsFormToolStripMenuItem.Text = "Settings";
+            this.settingsFormToolStripMenuItem.Click += new System.EventHandler(this.settingsFormToolStripMenuItem_Click);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
+            this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // newFontToolStripMenuItem
             // 
@@ -1167,6 +1230,13 @@
         private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importDDSToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem archivePackerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem archiveUnpackerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem settingsFormToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripExp_imp_Coord;
         private System.Windows.Forms.ToolStripMenuItem exportCoordinatesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem importCoordinatesToolStripMenuItem;

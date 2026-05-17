@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
 using System.Threading;
+using TTG_Tools;
 
 namespace TTG_Tools
 {
@@ -81,10 +82,10 @@ namespace TTG_Tools
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (MainMenu.settings.clearMessages) listBox1.Clear();
+            if (AppData.settings.clearMessages) listBox1.Clear();
 
             // Keep runtime setting in sync with UI checkbox state.
-            MainMenu.settings.enableImportTextReplace = checkEnableImportTextReplace.Checked;
+            AppData.settings.enableImportTextReplace = checkEnableImportTextReplace.Checked;
 
             SaveImportReplaceRulesFromGrid(false);
 
@@ -96,7 +97,7 @@ namespace TTG_Tools
 
             try
             {
-                DirectoryInfo di = new DirectoryInfo(MainMenu.settings.pathForInputFolder);
+                DirectoryInfo di = new DirectoryInfo(AppData.settings.pathForInputFolder);
                 fi = di.GetFiles();
             }
             catch
@@ -105,15 +106,15 @@ namespace TTG_Tools
                 return;
             }
 
-            /*if (checkUnicode.Checked) MainMenu.settings.unicodeSettings = 0;
-            else MainMenu.settings.unicodeSettings = 1;*/
+            /*if (checkUnicode.Checked) AppData.settings.unicodeSettings = 0;
+            else AppData.settings.unicodeSettings = 1;*/
 
             EncVersion = comboBox2.SelectedIndex != 1 ? 2 : 7;
 
-            string versionOfGame = MainMenu.gamelist[comboBox1.SelectedIndex].gamename;
+            string versionOfGame = AppData.gamelist[comboBox1.SelectedIndex].gamename;
             numKey = comboBox1.SelectedIndex;
             selected_index = comboBox2.SelectedIndex;
-            byte[] encKey = MainMenu.settings.customKey ? Methods.stringToKey(MainMenu.settings.encCustomKey) : MainMenu.gamelist[numKey].key;
+            byte[] encKey = AppData.settings.customKey ? Methods.stringToKey(AppData.settings.encCustomKey) : AppData.gamelist[numKey].key;
 
             //Create import files thread
             var processImport = new ForThreads();
@@ -121,13 +122,13 @@ namespace TTG_Tools
             List<string> parametresImport = new List<string>();
             parametresImport.Add(versionOfGame);
             parametresImport.Add(".dds");
-            parametresImport.Add(MainMenu.settings.pathForInputFolder);
-            parametresImport.Add(MainMenu.settings.pathForOutputFolder);
-            parametresImport.Add(MainMenu.settings.deleteD3DTXafterImport.ToString());
-            parametresImport.Add(MainMenu.settings.deleteDDSafterImport.ToString());
+            parametresImport.Add(AppData.settings.pathForInputFolder);
+            parametresImport.Add(AppData.settings.pathForOutputFolder);
+            parametresImport.Add(AppData.settings.deleteD3DTXafterImport.ToString());
+            parametresImport.Add(AppData.settings.deleteDDSafterImport.ToString());
             parametresImport.Add(Convert.ToString(EncVersion));
-            parametresImport.Add(MainMenu.settings.encLangdb.ToString());
-            parametresImport.Add(MainMenu.settings.encNewLua.ToString());
+            parametresImport.Add(AppData.settings.encLangdb.ToString());
+            parametresImport.Add(AppData.settings.encNewLua.ToString());
             parametresImport.Add(BitConverter.ToString(encKey).Replace("-", ""));
 
             threadImport = new Thread(new ParameterizedThreadStart(processImport.DoImportEncoding));
@@ -141,13 +142,13 @@ namespace TTG_Tools
 
         private void buttonDecrypt_Click(object sender, EventArgs e)
         {
-            if (MainMenu.settings.clearMessages) listBox1.Clear();
+            if (AppData.settings.clearMessages) listBox1.Clear();
 
-            string versionOfGame = MainMenu.gamelist[comboBox1.SelectedIndex].gamename;
+            string versionOfGame = AppData.gamelist[comboBox1.SelectedIndex].gamename;
             numKey = comboBox1.SelectedIndex;
             selected_index = comboBox2.SelectedIndex;
 
-            byte[] encKey = MainMenu.settings.customKey ? Methods.stringToKey(MainMenu.settings.encCustomKey) : MainMenu.gamelist[comboBox1.SelectedIndex].key;
+            byte[] encKey = AppData.settings.customKey ? Methods.stringToKey(AppData.settings.encCustomKey) : AppData.gamelist[comboBox1.SelectedIndex].key;
 
             string debug = null;
 
@@ -156,7 +157,7 @@ namespace TTG_Tools
             Methods.DeleteCurrentFile("\\del.me");
             try
             {
-                DirectoryInfo di = new DirectoryInfo(MainMenu.settings.pathForInputFolder);
+                DirectoryInfo di = new DirectoryInfo(AppData.settings.pathForInputFolder);
                 fi = di.GetFiles();
             }
             catch
@@ -169,8 +170,8 @@ namespace TTG_Tools
             var processExport = new ForThreads();
             processExport.ReportForWork += AddNewReport;
             List<string> parametresExport = new List<string>();
-            parametresExport.Add(MainMenu.settings.pathForInputFolder);
-            parametresExport.Add(MainMenu.settings.pathForOutputFolder);
+            parametresExport.Add(AppData.settings.pathForInputFolder);
+            parametresExport.Add(AppData.settings.pathForOutputFolder);
             parametresExport.Add(versionOfGame);
             parametresExport.Add(BitConverter.ToString(encKey).Replace("-", ""));
             parametresExport.Add(Convert.ToString(arc_version));
@@ -180,10 +181,10 @@ namespace TTG_Tools
 
             if (debug != null)
             {
-                StreamWriter sw = new StreamWriter(MainMenu.settings.pathForOutputFolder + "\\bugs.txt");
+                StreamWriter sw = new StreamWriter(AppData.settings.pathForOutputFolder + "\\bugs.txt");
                 sw.Write(debug);
                 sw.Close();
-                AddNewReport("Bugs have been written in file " + MainMenu.settings.pathForOutputFolder + "\\bugs.txt");
+                AddNewReport("Bugs have been written in file " + AppData.settings.pathForOutputFolder + "\\bugs.txt");
             }
         }
 
@@ -209,48 +210,48 @@ namespace TTG_Tools
 
             comboBox1.Items.Clear();
 
-            for (int i = 0; i < MainMenu.gamelist.Count; i++)
+            for (int i = 0; i < AppData.gamelist.Count; i++)
             {
-                comboBox1.Items.Add(i + ". " + MainMenu.gamelist[i].gamename);
+                comboBox1.Items.Add(i + ". " + AppData.gamelist[i].gamename);
             }
 
             #endregion
 
-            comboBox1.SelectedIndex = MainMenu.settings.encKeyIndex;
-            comboBox2.SelectedIndex = MainMenu.settings.versionEnc;
+            comboBox1.SelectedIndex = AppData.settings.encKeyIndex;
+            comboBox2.SelectedIndex = AppData.settings.versionEnc;
             labelUnicode.Text = "Unicode is ";
-            labelUnicode.Text += MainMenu.settings.unicodeSettings == 0 ? "set." : "not set.";
-            sortLabel.Text = MainMenu.settings.sortSameString ? "Warning! Some files may be slowly extract due enabled sort strings." : "";
-            checkEncDDS.Checked = MainMenu.settings.encDDSonly;
-            checkIOS.Checked = MainMenu.settings.iOSsupport;
-            checkEncLangdb.Checked = MainMenu.settings.encLangdb;
-            CheckNewEngine.Checked = MainMenu.settings.encNewLua;
-            checkRemoveBlanksBetweenCjk.Checked = MainMenu.settings.removeBlanksBetweenCjkCharsInImport;
-            checkReplaceDotToChinesePeriod.Checked = MainMenu.settings.replaceDotToChinesePeriodInImport;
-            checkNormalizeNewlinePunctuation.Checked = MainMenu.settings.normalizePunctuationBeforeNewlineInImport;
-            checkAutoInsertSubtitleNewline.Checked = MainMenu.settings.autoInsertSubtitleNewlineInImport;
-            checkEnableImportTextReplace.Checked = MainMenu.settings.enableImportTextReplace;
-            textBoxImportTextReplaceFind.Text = MainMenu.settings.importTextReplaceFind ?? "";
-            textBoxImportTextReplaceWith.Text = MainMenu.settings.importTextReplaceWith ?? "";
+            labelUnicode.Text += AppData.settings.unicodeSettings == 0 ? "set." : "not set.";
+            sortLabel.Text = AppData.settings.sortSameString ? "Warning! Some files may be slowly extract due enabled sort strings." : "";
+            checkEncDDS.Checked = AppData.settings.encDDSonly;
+            checkIOS.Checked = AppData.settings.iOSsupport;
+            checkEncLangdb.Checked = AppData.settings.encLangdb;
+            CheckNewEngine.Checked = AppData.settings.encNewLua;
+            checkRemoveBlanksBetweenCjk.Checked = AppData.settings.removeBlanksBetweenCjkCharsInImport;
+            checkReplaceDotToChinesePeriod.Checked = AppData.settings.replaceDotToChinesePeriodInImport;
+            checkNormalizeNewlinePunctuation.Checked = AppData.settings.normalizePunctuationBeforeNewlineInImport;
+            checkAutoInsertSubtitleNewline.Checked = AppData.settings.autoInsertSubtitleNewlineInImport;
+            checkEnableImportTextReplace.Checked = AppData.settings.enableImportTextReplace;
+            textBoxImportTextReplaceFind.Text = AppData.settings.importTextReplaceFind ?? "";
+            textBoxImportTextReplaceWith.Text = AppData.settings.importTextReplaceWith ?? "";
             LoadImportReplaceRulesToGrid();
 
-            if (MainMenu.settings.swizzlePS4 || MainMenu.settings.swizzleNintendoSwitch || MainMenu.settings.swizzleXbox360 || MainMenu.settings.swizzlePSVita || MainMenu.settings.swizzleNintendoWii)
+            if (AppData.settings.swizzlePS4 || AppData.settings.swizzleNintendoSwitch || AppData.settings.swizzleXbox360 || AppData.settings.swizzlePSVita || AppData.settings.swizzleNintendoWii)
             {
-                if (MainMenu.settings.swizzleNintendoSwitch) rbSwitchSwizzle.Checked = true;
-                else if (MainMenu.settings.swizzlePS4) rbPS4Swizzle.Checked = true;
-                else if (MainMenu.settings.swizzleXbox360) rbXbox360Swizzle.Checked = true;
-                else if (MainMenu.settings.swizzlePSVita) rbPSVitaSwizzle.Checked = true;
-                else if (MainMenu.settings.swizzleNintendoWii) rbWiiSwizzle.Checked = true;
+                if (AppData.settings.swizzleNintendoSwitch) rbSwitchSwizzle.Checked = true;
+                else if (AppData.settings.swizzlePS4) rbPS4Swizzle.Checked = true;
+                else if (AppData.settings.swizzleXbox360) rbXbox360Swizzle.Checked = true;
+                else if (AppData.settings.swizzlePSVita) rbPSVitaSwizzle.Checked = true;
+                else if (AppData.settings.swizzleNintendoWii) rbWiiSwizzle.Checked = true;
             }
             else rbNoSwizzle.Checked = true;
 
-            if (MainMenu.settings.customKey && Methods.stringToKey(MainMenu.settings.encCustomKey) != null)
+            if (AppData.settings.customKey && Methods.stringToKey(AppData.settings.encCustomKey) != null)
             {
-                checkCustomKey.Checked = MainMenu.settings.customKey;
-                textBox1.Text = MainMenu.settings.encCustomKey;
+                checkCustomKey.Checked = AppData.settings.customKey;
+                textBox1.Text = AppData.settings.encCustomKey;
             }
 
-            if (MainMenu.settings.ASCII_N == 1252)
+            if (AppData.settings.ASCII_N == 1252)
             {
                 //Make unvisible that option for users with windows-1252 encoding
                 labelUnicode.Visible = false;
@@ -277,7 +278,7 @@ namespace TTG_Tools
             }
             finally
             {
-                Settings.SaveConfig(MainMenu.settings);
+                Settings.SaveConfig(AppData.settings);
             }
 
             if ((threadExport != null) && threadExport.IsAlive)
@@ -298,37 +299,37 @@ namespace TTG_Tools
 
         private void CheckNewEngine_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.encNewLua = CheckNewEngine.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.encNewLua = CheckNewEngine.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void checkEncDDS_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.encDDSonly = checkEncDDS.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.encDDSonly = checkEncDDS.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void checkEncLangdb_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.encLangdb = checkEncLangdb.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.encLangdb = checkEncLangdb.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void checkIOS_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.iOSsupport = checkIOS.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.iOSsupport = checkIOS.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void checkCustomKey_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.customKey = checkCustomKey.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.customKey = checkCustomKey.Checked;
+            Settings.SaveConfig(AppData.settings);
 
-            if ((MainMenu.settings.customKey == true) &&
-                ((MainMenu.settings.encCustomKey != "") && (MainMenu.settings.encCustomKey != null)))
+            if ((AppData.settings.customKey == true) &&
+                ((AppData.settings.encCustomKey != "") && (AppData.settings.encCustomKey != null)))
             {
-                textBox1.Text = MainMenu.settings.encCustomKey;
+                textBox1.Text = AppData.settings.encCustomKey;
             }
             else
             {
@@ -338,23 +339,23 @@ namespace TTG_Tools
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.encKeyIndex = comboBox1.SelectedIndex;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.encKeyIndex = comboBox1.SelectedIndex;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.versionEnc = comboBox2.SelectedIndex;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.versionEnc = comboBox2.SelectedIndex;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             if (checkCustomKey.Checked && Methods.stringToKey(textBox1.Text) != null)
             {
-                MainMenu.settings.customKey = checkCustomKey.Checked;
-                MainMenu.settings.encCustomKey = textBox1.Text;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.customKey = checkCustomKey.Checked;
+                AppData.settings.encCustomKey = textBox1.Text;
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
@@ -370,9 +371,9 @@ namespace TTG_Tools
             AutoDePackerSettings settingsForm = (AutoDePackerSettings)sender;
 
             labelUnicode.Text = "Unicode is ";
-            labelUnicode.Text += MainMenu.settings.unicodeSettings == 0 ? "set." : "not set.";
+            labelUnicode.Text += AppData.settings.unicodeSettings == 0 ? "set." : "not set.";
 
-            sortLabel.Text = MainMenu.settings.sortSameString ? "Warning! Some files may be slowly extract due enabled sort strings." : "";
+            sortLabel.Text = AppData.settings.sortSameString ? "Warning! Some files may be slowly extract due enabled sort strings." : "";
         }
 
         private void SettingsForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -384,12 +385,12 @@ namespace TTG_Tools
         {
             if (rbNoSwizzle.Checked)
             {
-                MainMenu.settings.swizzleNintendoSwitch = false;
-                MainMenu.settings.swizzlePS4 = false;
-                MainMenu.settings.swizzleXbox360 = false;
-                MainMenu.settings.swizzlePSVita = false;
-                MainMenu.settings.swizzleNintendoWii = false;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.swizzleNintendoSwitch = false;
+                AppData.settings.swizzlePS4 = false;
+                AppData.settings.swizzleXbox360 = false;
+                AppData.settings.swizzlePSVita = false;
+                AppData.settings.swizzleNintendoWii = false;
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
@@ -397,12 +398,12 @@ namespace TTG_Tools
         {
             if (rbPS4Swizzle.Checked)
             {
-                MainMenu.settings.swizzlePS4 = true;
-                MainMenu.settings.swizzleNintendoSwitch = false;
-                MainMenu.settings.swizzleXbox360 = false;
-                MainMenu.settings.swizzlePSVita = false;
-                MainMenu.settings.swizzleNintendoWii = false;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.swizzlePS4 = true;
+                AppData.settings.swizzleNintendoSwitch = false;
+                AppData.settings.swizzleXbox360 = false;
+                AppData.settings.swizzlePSVita = false;
+                AppData.settings.swizzleNintendoWii = false;
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
@@ -410,12 +411,12 @@ namespace TTG_Tools
         {
             if (rbSwitchSwizzle.Checked)
             {
-                MainMenu.settings.swizzleNintendoSwitch = true;
-                MainMenu.settings.swizzlePS4 = false;
-                MainMenu.settings.swizzleXbox360 = false;
-                MainMenu.settings.swizzlePSVita = false;
-                MainMenu.settings.swizzleNintendoWii = false;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.swizzleNintendoSwitch = true;
+                AppData.settings.swizzlePS4 = false;
+                AppData.settings.swizzleXbox360 = false;
+                AppData.settings.swizzlePSVita = false;
+                AppData.settings.swizzleNintendoWii = false;
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
@@ -423,12 +424,12 @@ namespace TTG_Tools
         {
             if (rbXbox360Swizzle.Checked)
             {
-                MainMenu.settings.swizzleXbox360 = true;
-                MainMenu.settings.swizzlePS4 = false;
-                MainMenu.settings.swizzleNintendoSwitch = false;
-                MainMenu.settings.swizzlePSVita = false;
-                MainMenu.settings.swizzleNintendoWii = false;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.swizzleXbox360 = true;
+                AppData.settings.swizzlePS4 = false;
+                AppData.settings.swizzleNintendoSwitch = false;
+                AppData.settings.swizzlePSVita = false;
+                AppData.settings.swizzleNintendoWii = false;
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
@@ -436,12 +437,12 @@ namespace TTG_Tools
         {
             if (rbPSVitaSwizzle.Checked)
             {
-                MainMenu.settings.swizzlePSVita = true;
-                MainMenu.settings.swizzlePS4 = false;
-                MainMenu.settings.swizzleNintendoSwitch = false;
-                MainMenu.settings.swizzleXbox360 = false;
-                MainMenu.settings.swizzleNintendoWii = false;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.swizzlePSVita = true;
+                AppData.settings.swizzlePS4 = false;
+                AppData.settings.swizzleNintendoSwitch = false;
+                AppData.settings.swizzleXbox360 = false;
+                AppData.settings.swizzleNintendoWii = false;
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
@@ -450,55 +451,55 @@ namespace TTG_Tools
         {
             if (rbWiiSwizzle.Checked)
             {
-                MainMenu.settings.swizzlePSVita = false;
-                MainMenu.settings.swizzlePS4 = false;
-                MainMenu.settings.swizzleNintendoSwitch = false;
-                MainMenu.settings.swizzleXbox360 = false;
-                MainMenu.settings.swizzleNintendoWii = true;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.swizzlePSVita = false;
+                AppData.settings.swizzlePS4 = false;
+                AppData.settings.swizzleNintendoSwitch = false;
+                AppData.settings.swizzleXbox360 = false;
+                AppData.settings.swizzleNintendoWii = true;
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
         private void checkRemoveBlanksBetweenCjk_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.removeBlanksBetweenCjkCharsInImport = checkRemoveBlanksBetweenCjk.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.removeBlanksBetweenCjkCharsInImport = checkRemoveBlanksBetweenCjk.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void checkReplaceDotToChinesePeriod_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.replaceDotToChinesePeriodInImport = checkReplaceDotToChinesePeriod.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.replaceDotToChinesePeriodInImport = checkReplaceDotToChinesePeriod.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void checkNormalizeNewlinePunctuation_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.normalizePunctuationBeforeNewlineInImport = checkNormalizeNewlinePunctuation.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.normalizePunctuationBeforeNewlineInImport = checkNormalizeNewlinePunctuation.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void checkAutoInsertSubtitleNewline_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.autoInsertSubtitleNewlineInImport = checkAutoInsertSubtitleNewline.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.autoInsertSubtitleNewlineInImport = checkAutoInsertSubtitleNewline.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void checkEnableImportTextReplace_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.enableImportTextReplace = checkEnableImportTextReplace.Checked;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.enableImportTextReplace = checkEnableImportTextReplace.Checked;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void textBoxImportTextReplaceFind_TextChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.importTextReplaceFind = textBoxImportTextReplaceFind.Text;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.importTextReplaceFind = textBoxImportTextReplaceFind.Text;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void textBoxImportTextReplaceWith_TextChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.importTextReplaceWith = textBoxImportTextReplaceWith.Text;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.importTextReplaceWith = textBoxImportTextReplaceWith.Text;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void LoadImportReplaceRulesToGrid()
@@ -509,7 +510,7 @@ namespace TTG_Tools
 
             _importReplaceRulesGrid.Rows.Clear();
 
-            List<ImportTextReplaceRule> rules = MainMenu.settings.importTextReplaceRules;
+            List<ImportTextReplaceRule> rules = AppData.settings.importTextReplaceRules;
 
             if (rules != null && rules.Count > 0)
             {
@@ -519,9 +520,9 @@ namespace TTG_Tools
                     _importReplaceRulesGrid.Rows.Add(rule.enabled, rule.find ?? "", rule.replaceWith ?? "");
                 }
             }
-            else if (!String.IsNullOrEmpty(MainMenu.settings.importTextReplaceFind))
+            else if (!String.IsNullOrEmpty(AppData.settings.importTextReplaceFind))
             {
-                _importReplaceRulesGrid.Rows.Add(true, MainMenu.settings.importTextReplaceFind, MainMenu.settings.importTextReplaceWith ?? "");
+                _importReplaceRulesGrid.Rows.Add(true, AppData.settings.importTextReplaceFind, AppData.settings.importTextReplaceWith ?? "");
             }
             else
             {
@@ -545,9 +546,9 @@ namespace TTG_Tools
             }
 
             List<ImportTextReplaceRule> rules = new List<ImportTextReplaceRule>();
-            List<ImportTextReplaceRule> existingRules = MainMenu.settings.importTextReplaceRules == null
+            List<ImportTextReplaceRule> existingRules = AppData.settings.importTextReplaceRules == null
                 ? new List<ImportTextReplaceRule>()
-                : MainMenu.settings.importTextReplaceRules;
+                : AppData.settings.importTextReplaceRules;
 
             for (int i = 0; i < _importReplaceRulesGrid.Rows.Count; i++)
             {
@@ -560,9 +561,9 @@ namespace TTG_Tools
                 {
                     bool.TryParse(row.Cells[0].Value.ToString(), out enabled);
                 }
-                else if (row.Index < MainMenu.settings.importTextReplaceRules.Count && MainMenu.settings.importTextReplaceRules[row.Index] != null)
+                else if (row.Index < AppData.settings.importTextReplaceRules.Count && AppData.settings.importTextReplaceRules[row.Index] != null)
                 {
-                    enabled = MainMenu.settings.importTextReplaceRules[row.Index].enabled;
+                    enabled = AppData.settings.importTextReplaceRules[row.Index].enabled;
                 }
 
                 string find = row.Cells[1].Value == null ? "" : row.Cells[1].Value.ToString();
@@ -599,7 +600,7 @@ namespace TTG_Tools
                 rules = CloneImportReplaceRules(existingRules);
             }
 
-            MainMenu.settings.importTextReplaceRules = rules;
+            AppData.settings.importTextReplaceRules = rules;
 
             ImportTextReplaceRule firstActive = null;
             for (int i = 0; i < rules.Count; i++)
@@ -611,13 +612,13 @@ namespace TTG_Tools
                 }
             }
 
-            MainMenu.settings.importTextReplaceFind = firstActive == null ? "" : firstActive.find;
-            MainMenu.settings.importTextReplaceWith = firstActive == null ? "" : (firstActive.replaceWith ?? "");
+            AppData.settings.importTextReplaceFind = firstActive == null ? "" : firstActive.find;
+            AppData.settings.importTextReplaceWith = firstActive == null ? "" : (firstActive.replaceWith ?? "");
 
             // If user has configured effective rules, auto-enable Replace to avoid silent no-op.
-            if (HasMeaningfulImportReplaceRules(rules) && !MainMenu.settings.enableImportTextReplace)
+            if (HasMeaningfulImportReplaceRules(rules) && !AppData.settings.enableImportTextReplace)
             {
-                MainMenu.settings.enableImportTextReplace = true;
+                AppData.settings.enableImportTextReplace = true;
                 if (checkEnableImportTextReplace != null && !checkEnableImportTextReplace.Checked)
                 {
                     checkEnableImportTextReplace.Checked = true;
@@ -626,7 +627,7 @@ namespace TTG_Tools
 
             if (saveConfig)
             {
-                Settings.SaveConfig(MainMenu.settings);
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
@@ -713,7 +714,7 @@ namespace TTG_Tools
             if (_editingRuleRowIndex < 0) return;
             if (_editingRuleColumnIndex != 1 && _editingRuleColumnIndex != 2) return;
 
-            List<ImportTextReplaceRule> rules = MainMenu.settings.importTextReplaceRules;
+            List<ImportTextReplaceRule> rules = AppData.settings.importTextReplaceRules;
             while (rules.Count <= _editingRuleRowIndex)
             {
                 rules.Add(new ImportTextReplaceRule());
@@ -730,12 +731,12 @@ namespace TTG_Tools
             }
 
             rules[_editingRuleRowIndex] = rule;
-            MainMenu.settings.importTextReplaceRules = rules;
+            AppData.settings.importTextReplaceRules = rules;
         }
 
         private void PersistImportReplaceRulesDraftToConfig()
         {
-            List<ImportTextReplaceRule> rules = MainMenu.settings.importTextReplaceRules;
+            List<ImportTextReplaceRule> rules = AppData.settings.importTextReplaceRules;
 
             ImportTextReplaceRule firstActive = null;
             for (int i = 0; i < rules.Count; i++)
@@ -747,19 +748,19 @@ namespace TTG_Tools
                 }
             }
 
-            MainMenu.settings.importTextReplaceFind = firstActive == null ? "" : firstActive.find;
-            MainMenu.settings.importTextReplaceWith = firstActive == null ? "" : (firstActive.replaceWith ?? "");
+            AppData.settings.importTextReplaceFind = firstActive == null ? "" : firstActive.find;
+            AppData.settings.importTextReplaceWith = firstActive == null ? "" : (firstActive.replaceWith ?? "");
 
-            if (HasMeaningfulImportReplaceRules(rules) && !MainMenu.settings.enableImportTextReplace)
+            if (HasMeaningfulImportReplaceRules(rules) && !AppData.settings.enableImportTextReplace)
             {
-                MainMenu.settings.enableImportTextReplace = true;
+                AppData.settings.enableImportTextReplace = true;
                 if (checkEnableImportTextReplace != null && !checkEnableImportTextReplace.Checked)
                 {
                     checkEnableImportTextReplace.Checked = true;
                 }
             }
 
-            Settings.SaveConfig(MainMenu.settings);
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void ImportReplaceRulesGrid_CurrentCellDirtyStateChanged(object sender, EventArgs e)
@@ -870,3 +871,6 @@ namespace TTG_Tools
         }
     }
 }
+
+
+

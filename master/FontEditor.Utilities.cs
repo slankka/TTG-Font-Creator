@@ -200,10 +200,10 @@ namespace TTG_Tools
         private uint ResolveTargetPlatformForImportedDds(uint existingPlatform)
         {
             // Explicit swizzle selection has the highest priority.
-            if (MainMenu.settings.swizzleNintendoSwitch) return 15u;
-            if (MainMenu.settings.swizzlePS4) return 11u;
-            if (MainMenu.settings.swizzleXbox360) return 4u;
-            if (MainMenu.settings.swizzlePSVita) return 9u;
+            if (AppData.settings.swizzleNintendoSwitch) return 15u;
+            if (AppData.settings.swizzlePS4) return 11u;
+            if (AppData.settings.swizzleXbox360) return 4u;
+            if (AppData.settings.swizzlePSVita) return 9u;
 
             // Reuse platform parsed from source font/new texture template when valid.
             if (IsKnownTexturePlatform(existingPlatform)) return existingPlatform;
@@ -229,3 +229,4 @@ namespace TTG_Tools
         }
     }
 }
+

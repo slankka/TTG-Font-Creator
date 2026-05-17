@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -266,7 +266,7 @@ namespace TTG_Tools
 
         private static byte[] GetEncryptionKeyForGame(string gameName)
         {
-            var gameKey = MainMenu.gamelist.FirstOrDefault(g => g.gamename == gameName);
+            var gameKey = AppData.gamelist.FirstOrDefault(g => g.gamename == gameName);
             if (gameKey == null || gameKey.key == null)
             {
                 throw new InvalidOperationException("Could not find encryption key for selected game.");
@@ -748,3 +748,4 @@ namespace TTG_Tools
         }
     }
 }
+

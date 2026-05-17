@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -19,21 +19,21 @@ namespace TTG_Tools
 
         private void AutoDePackerSettings_Load(object sender, EventArgs e)
         {
-            if (MainMenu.settings.tsvFormat)
+            if (AppData.settings.tsvFormat)
             {
                 tsvFilesRB.Checked = true;
             }
             else
             {
-                if (!MainMenu.settings.tsvFormat && MainMenu.settings.newTxtFormat) newTxtFormatRB.Checked = true;
+                if (!AppData.settings.tsvFormat && AppData.settings.newTxtFormat) newTxtFormatRB.Checked = true;
                 else txtFilesRB.Checked = true;
             }
 
-            checkBoxChangeLangFlags.Enabled = MainMenu.settings.newTxtFormat;
-            checkBoxChangeLangFlags.Visible = MainMenu.settings.newTxtFormat;
-            checkBoxChangeLangFlags.Checked = MainMenu.settings.changeLangFlags;
+            checkBoxChangeLangFlags.Enabled = AppData.settings.newTxtFormat;
+            checkBoxChangeLangFlags.Visible = AppData.settings.newTxtFormat;
+            checkBoxChangeLangFlags.Checked = AppData.settings.changeLangFlags;
 
-            switch(MainMenu.settings.unicodeSettings)
+            switch(AppData.settings.unicodeSettings)
             {
                 case 1:
                     rbNonNormalUnicode2.Checked = true;
@@ -48,52 +48,52 @@ namespace TTG_Tools
                     break;
             }
 
-            rbTwdNintendoSwitch.Checked = MainMenu.settings.supportTwdNintendoSwitch;
+            rbTwdNintendoSwitch.Checked = AppData.settings.supportTwdNintendoSwitch;
 
-            checkBoxSortStrings.Checked = MainMenu.settings.sortSameString;
-            clearMessagesCB.Checked = MainMenu.settings.clearMessages;
-            checkBoxD3DTX_after_import.Checked = MainMenu.settings.deleteD3DTXafterImport;
-            checkBoxDDS_after_import.Checked = MainMenu.settings.deleteDDSafterImport;
-            checkBoxExportRealID.Checked = MainMenu.settings.exportRealID;
-            checkBoxImportingOfNames.Checked = MainMenu.settings.importingOfName;
-            cbIgnoreEmptyStrings.Checked = MainMenu.settings.ignoreEmptyStrings;
+            checkBoxSortStrings.Checked = AppData.settings.sortSameString;
+            clearMessagesCB.Checked = AppData.settings.clearMessages;
+            checkBoxD3DTX_after_import.Checked = AppData.settings.deleteD3DTXafterImport;
+            checkBoxDDS_after_import.Checked = AppData.settings.deleteDDSafterImport;
+            checkBoxExportRealID.Checked = AppData.settings.exportRealID;
+            checkBoxImportingOfNames.Checked = AppData.settings.importingOfName;
+            cbIgnoreEmptyStrings.Checked = AppData.settings.ignoreEmptyStrings;
 
-            textBoxInputFolder.Text = MainMenu.settings.pathForInputFolder;
-            textBoxOutputFolder.Text = MainMenu.settings.pathForOutputFolder;
+            textBoxInputFolder.Text = AppData.settings.pathForInputFolder;
+            textBoxOutputFolder.Text = AppData.settings.pathForOutputFolder;
         }
 
         private void okBtn_Click(object sender, EventArgs e)
         {
-            if (Directory.Exists(textBoxInputFolder.Text)) MainMenu.settings.pathForInputFolder = textBoxInputFolder.Text;
-            if (Directory.Exists(textBoxOutputFolder.Text)) MainMenu.settings.pathForOutputFolder = textBoxOutputFolder.Text;
+            if (Directory.Exists(textBoxInputFolder.Text)) AppData.settings.pathForInputFolder = textBoxInputFolder.Text;
+            if (Directory.Exists(textBoxOutputFolder.Text)) AppData.settings.pathForOutputFolder = textBoxOutputFolder.Text;
 
-            MainMenu.settings.clearMessages = clearMessagesCB.Checked;
-            MainMenu.settings.sortSameString = checkBoxSortStrings.Checked;
-            MainMenu.settings.deleteD3DTXafterImport = checkBoxD3DTX_after_import.Checked;
-            MainMenu.settings.deleteDDSafterImport = checkBoxDDS_after_import.Checked;
-            MainMenu.settings.exportRealID = checkBoxExportRealID.Checked;
-            MainMenu.settings.importingOfName = checkBoxImportingOfNames.Checked;
-            MainMenu.settings.changeLangFlags = checkBoxChangeLangFlags.Checked;
-            MainMenu.settings.ignoreEmptyStrings = cbIgnoreEmptyStrings.Checked;
+            AppData.settings.clearMessages = clearMessagesCB.Checked;
+            AppData.settings.sortSameString = checkBoxSortStrings.Checked;
+            AppData.settings.deleteD3DTXafterImport = checkBoxD3DTX_after_import.Checked;
+            AppData.settings.deleteDDSafterImport = checkBoxDDS_after_import.Checked;
+            AppData.settings.exportRealID = checkBoxExportRealID.Checked;
+            AppData.settings.importingOfName = checkBoxImportingOfNames.Checked;
+            AppData.settings.changeLangFlags = checkBoxChangeLangFlags.Checked;
+            AppData.settings.ignoreEmptyStrings = cbIgnoreEmptyStrings.Checked;
 
-            if (rbNormalUnicode.Checked) MainMenu.settings.unicodeSettings = 0;
-            else if (rbNonNormalUnicode2.Checked) MainMenu.settings.unicodeSettings = 1;
-            else MainMenu.settings.unicodeSettings = 2;
+            if (rbNormalUnicode.Checked) AppData.settings.unicodeSettings = 0;
+            else if (rbNonNormalUnicode2.Checked) AppData.settings.unicodeSettings = 1;
+            else AppData.settings.unicodeSettings = 2;
 
-            MainMenu.settings.supportTwdNintendoSwitch = rbTwdNintendoSwitch.Checked;
+            AppData.settings.supportTwdNintendoSwitch = rbTwdNintendoSwitch.Checked;
 
             if (tsvFilesRB.Checked)
             {
-                MainMenu.settings.tsvFormat = true;
-                MainMenu.settings.newTxtFormat = false;
+                AppData.settings.tsvFormat = true;
+                AppData.settings.newTxtFormat = false;
             }
             else
             {
-                MainMenu.settings.newTxtFormat = !txtFilesRB.Checked && newTxtFormatRB.Checked;
-                MainMenu.settings.tsvFormat = false;
+                AppData.settings.newTxtFormat = !txtFilesRB.Checked && newTxtFormatRB.Checked;
+                AppData.settings.tsvFormat = false;
             }
 
-            Settings.SaveConfig(MainMenu.settings);
+            Settings.SaveConfig(AppData.settings);
 
             Close();
         }
@@ -137,3 +137,4 @@ namespace TTG_Tools
         }
     }
 }
+

@@ -489,7 +489,7 @@ namespace TTG_Tools
                                                     int puase = 1;
                                                 }
                                                 byte[] tmp_ch = BitConverter.GetBytes(Convert.ToUInt32(splitted[k + 1]));
-                                                tmp_ch = Encoding.Convert(Encoding.Unicode, Encoding.GetEncoding(MainMenu.settings.ASCII_N), tmp_ch);
+                                                tmp_ch = Encoding.Convert(Encoding.Unicode, Encoding.GetEncoding(AppData.settings.ASCII_N), tmp_ch);
                                                 tmpChar = BitConverter.ToUInt16(tmp_ch, 0);
                                             }
                                         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +8,7 @@ using TTG_Tools.ClassesStructs.Text;
 using TTG_Tools.InEngineWords;
 using System.Windows.Forms.VisualStyles;
 using System.Security.Cryptography;
+using TTG_Tools;
 
 namespace TTG_Tools.Texts
 {
@@ -28,7 +29,7 @@ namespace TTG_Tools.Texts
                 dlog.blockFileNameSize = br.ReadInt32();
                 dlog.fileNameSize = br.ReadInt32();
                 byte[] tmp = br.ReadBytes(dlog.fileNameSize);
-                dlog.dlogFileName = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmp);
+                dlog.dlogFileName = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmp);
 
                 dlog.someValue1 = br.ReadInt32();
                 dlog.someValue2 = br.ReadInt32();
@@ -84,7 +85,7 @@ namespace TTG_Tools.Texts
                     tmp = br.ReadBytes(dlog.landb.landbs[i].anmNameSize);
                     dlog.newLangdbBlockSize += dlog.landb.landbs[i].anmNameSize;
                     dlog.landb.newBlockLength += dlog.landb.landbs[i].anmNameSize;
-                    dlog.landb.landbs[i].anmName = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmp);
+                    dlog.landb.landbs[i].anmName = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmp);
 
                     dlog.landb.landbs[i].blockWavNameSize = br.ReadInt32();
                     dlog.newLangdbBlockSize += 4;
@@ -97,7 +98,7 @@ namespace TTG_Tools.Texts
                     tmp = br.ReadBytes(dlog.landb.landbs[i].wavNameSize);
                     dlog.newLangdbBlockSize += dlog.landb.landbs[i].wavNameSize;
                     dlog.landb.newBlockLength += dlog.landb.landbs[i].wavNameSize;
-                    dlog.landb.landbs[i].wavName = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmp);
+                    dlog.landb.landbs[i].wavName = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmp);
 
                     dlog.landb.landbs[i].blockLangresSize = br.ReadInt32();
                     //dlog.newLangdbBlockSize += 4;
@@ -124,7 +125,7 @@ namespace TTG_Tools.Texts
 
                             tmp = br.ReadBytes(dlog.landb.landbs[i].lang[j].actorNameSize);
                             //Don't calculate actor name's size!
-                            dlog.landb.landbs[i].lang[j].actorName = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmp);
+                            dlog.landb.landbs[i].lang[j].actorName = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmp);
 
                             dlog.landb.landbs[i].lang[j].blockActorSpeechSize = br.ReadInt32();
                             //dlog.newLangdbBlockSize += 4;
@@ -136,7 +137,7 @@ namespace TTG_Tools.Texts
 
                             tmp = br.ReadBytes(dlog.landb.landbs[i].lang[j].actorSpeechSize);
                             //And don't caclulate actor speech's size!
-                            dlog.landb.landbs[i].lang[j].actorSpeech = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmp);
+                            dlog.landb.landbs[i].lang[j].actorSpeech = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmp);
 
                             dlog.landb.landbs[i].lang[j].someValue1 = br.ReadInt32();
                             //dlog.newLangdbBlockSize += 4;
@@ -226,7 +227,7 @@ namespace TTG_Tools.Texts
                 bw.Write(dlog.blockFileNameSize);
                 bw.Write(dlog.fileNameSize);
                 
-                tmp = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(dlog.dlogFileName);
+                tmp = Encoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(dlog.dlogFileName);
 
                 bw.Write(tmp);
 
@@ -258,13 +259,13 @@ namespace TTG_Tools.Texts
                     bw.Write(dlog.landb.landbs[i].blockAnmNameSize);
                     bw.Write(dlog.landb.landbs[i].anmNameSize);
 
-                    tmp = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(dlog.landb.landbs[i].anmName);
+                    tmp = Encoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(dlog.landb.landbs[i].anmName);
                     bw.Write(tmp);
 
                     bw.Write(dlog.landb.landbs[i].blockWavNameSize);
                     bw.Write(dlog.landb.landbs[i].wavNameSize);
 
-                    tmp = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(dlog.landb.landbs[i].wavName);
+                    tmp = Encoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(dlog.landb.landbs[i].wavName);
                     bw.Write(tmp);
 
                     var langresPos = bw.BaseStream.Position;
@@ -276,8 +277,8 @@ namespace TTG_Tools.Texts
 
                     for (int j = 0; j < dlog.landb.landbs[i].langresStrsCount; j++)
                     {
-                        byte[] tmpActorName = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(dlog.landb.landbs[i].lang[j].actorName);
-                        byte[] tmpActorSpeech = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(dlog.landb.landbs[i].lang[j].actorSpeech);
+                        byte[] tmpActorName = Encoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(dlog.landb.landbs[i].lang[j].actorName);
+                        byte[] tmpActorSpeech = Encoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(dlog.landb.landbs[i].lang[j].actorSpeech);
 
                         dlog.landb.landbs[i].lang[j].actorNameSize = tmpActorName.Length;
                         dlog.landb.landbs[i].lang[j].blockActorNameSize = tmpActorName.Length + 8;
@@ -377,7 +378,7 @@ namespace TTG_Tools.Texts
                 for (int j = 0; j < dlog.landb.landbs[i].langresStrsCount; j++)
                 {
                     index = -1;
-                    if (MainMenu.settings.importingOfName)
+                    if (AppData.settings.importingOfName)
                     {
                         index = Methods.GetIndex(commonTexts, dlog.landb.landbs[i].lang[j].stringNumber);
                         if(index != -1) dlog.landb.landbs[i].lang[j].actorName = commonTexts[index].actorName;
@@ -491,17 +492,17 @@ namespace TTG_Tools.Texts
                             txt.actorSpeechTranslation = dlog.landb.landbs[i].lang[j].actorSpeech;
                             txt.flags = "000"; //default will be 000
 
-                            if(((txt.actorSpeechOriginal == "") && !MainMenu.settings.ignoreEmptyStrings)
+                            if(((txt.actorSpeechOriginal == "") && !AppData.settings.ignoreEmptyStrings)
                                 || (txt.actorSpeechOriginal != "")) txts.txtList.Add(txt);
                         }
                     }
 
-                    if (MainMenu.settings.sortSameString) txts = Methods.SortString(txts);
+                    if (AppData.settings.sortSameString) txts = Methods.SortString(txts);
 
-                    string outputFile = MainMenu.settings.pathForOutputFolder + Path.DirectorySeparatorChar + fi.Name.Remove(fi.Name.Length - 4, 4);
-                    outputFile += MainMenu.settings.tsvFormat ? "tsv" : "txt";
+                    string outputFile = AppData.settings.pathForOutputFolder + Path.DirectorySeparatorChar + fi.Name.Remove(fi.Name.Length - 4, 4);
+                    outputFile += AppData.settings.tsvFormat ? "tsv" : "txt";
 
-                    switch(MainMenu.settings.newTxtFormat)
+                    switch(AppData.settings.newTxtFormat)
                     {
                         case true:
                             Texts.SaveText.NewMethod(txts.txtList, false, outputFile);
@@ -541,7 +542,7 @@ namespace TTG_Tools.Texts
                     ms = new MemoryStream(buffer);
                     br = new BinaryReader(ms);
 
-                    string outputFile = MainMenu.settings.pathForOutputFolder + "\\" + fi.Name;
+                    string outputFile = AppData.settings.pathForOutputFolder + "\\" + fi.Name;
 
                     int rebuildResult = RebuildDlog(br, outputFile, dlog);
 
@@ -550,7 +551,7 @@ namespace TTG_Tools.Texts
 
                     result = "File " + fi.Name + " successfully imported.";
 
-                    if (MainMenu.settings.enableImportTextReplace && Methods.HasEnabledImportReplaceRules())
+                    if (AppData.settings.enableImportTextReplace && Methods.HasEnabledImportReplaceRules())
                     {
                         result += " ReplaceLog[O=" + transformStats.ReplacedInOriginal + ", T=" + transformStats.ReplacedInTranslation + ", Total=" + transformStats.TotalReplaced + "]";
                     }
@@ -563,11 +564,11 @@ namespace TTG_Tools.Texts
                     dlog = null;
                     buffer = null;
 
-                    if ((EncKey != null) || MainMenu.settings.encLangdb)
+                    if ((EncKey != null) || AppData.settings.encLangdb)
                     {
                         buffer = File.ReadAllBytes(outputFile);
 
-                        if ((EncKey != null) && !MainMenu.settings.encLangdb)
+                        if ((EncKey != null) && !AppData.settings.encLangdb)
                         {
                             if (Methods.meta_crypt(buffer, EncKey, version, false) != 0)
                             {
@@ -575,17 +576,17 @@ namespace TTG_Tools.Texts
                                 result += " Successfull encrypted back!";
                             }
                         }
-                        else if (MainMenu.settings.encLangdb)
+                        else if (AppData.settings.encLangdb)
                         {
-                            byte[] key = new byte[MainMenu.gamelist[MainMenu.settings.encKeyIndex].key.Length];
-                            Array.Copy(MainMenu.gamelist[MainMenu.settings.encKeyIndex].key, 0, key, 0, key.Length);
+                            byte[] key = new byte[AppData.gamelist[AppData.settings.encKeyIndex].key.Length];
+                            Array.Copy(AppData.gamelist[AppData.settings.encKeyIndex].key, 0, key, 0, key.Length);
 
-                            if (MainMenu.settings.customKey)
+                            if (AppData.settings.customKey)
                             {
-                                key = Methods.stringToKey(MainMenu.settings.encCustomKey);
+                                key = Methods.stringToKey(AppData.settings.encCustomKey);
                             }
 
-                            version = MainMenu.settings.versionEnc == 0 ? 2 : 7;
+                            version = AppData.settings.versionEnc == 0 ? 2 : 7;
 
                             if (Methods.meta_crypt(buffer, key, version, false) != 0)
                             {
@@ -609,3 +610,5 @@ namespace TTG_Tools.Texts
         }
     }
 }
+
+

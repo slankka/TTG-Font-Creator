@@ -18,7 +18,7 @@ namespace TTG_Tools
                 return;
             }
 
-            if (MainMenu.settings.scanTextFilePaths == null || MainMenu.settings.scanTextFilePaths.Count == 0)
+            if (AppData.settings.scanTextFilePaths == null || AppData.settings.scanTextFilePaths.Count == 0)
             {
                 MessageBox.Show("No scan paths configured. Please add scan paths in Settings.", "No Scan Paths",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -29,7 +29,7 @@ namespace TTG_Tools
             textBoxLogOutput.AppendText("=== Missing Textures Detection Report ===\r\n");
             textBoxLogOutput.AppendText($"Scan Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\r\n");
             textBoxLogOutput.AppendText($"Font: {font.FontName}\r\n");
-            textBoxLogOutput.AppendText($"Scan Paths: {MainMenu.settings.scanTextFilePaths.Count}\r\n");
+            textBoxLogOutput.AppendText($"Scan Paths: {AppData.settings.scanTextFilePaths.Count}\r\n");
             textBoxLogOutput.AppendText("===========================================\r\n\r\n");
 
             try
@@ -78,7 +78,7 @@ namespace TTG_Tools
                 int filesScanned = 0;
                 int totalTextsFound = 0;
 
-                foreach (string scanPath in MainMenu.settings.scanTextFilePaths)
+                foreach (string scanPath in AppData.settings.scanTextFilePaths)
                 {
                     if (!Directory.Exists(scanPath))
                     {
@@ -193,7 +193,7 @@ namespace TTG_Tools
                 {
                     try
                     {
-                        string[] lines = File.ReadAllLines(file, Encoding.GetEncoding(MainMenu.settings.ASCII_N));
+                        string[] lines = File.ReadAllLines(file, Encoding.GetEncoding(AppData.settings.ASCII_N));
                         foreach (string line in lines)
                         {
                             if (line.StartsWith("speechTranslation="))

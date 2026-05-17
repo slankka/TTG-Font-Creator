@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TTG_Tools.ClassesStructs.Text;
 using System.IO;
+using TTG_Tools;
 
 namespace TTG_Tools.Texts
 {
@@ -63,7 +64,7 @@ namespace TTG_Tools.Texts
 
                     //Don't calculate actor name's length
                     byte[] tmp = br.ReadBytes(stringLength);
-                    langdb.langdbs[i].actorName = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmp);
+                    langdb.langdbs[i].actorName = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmp);
 
                     if (langdb.isBlockLength)
                     {
@@ -76,7 +77,7 @@ namespace TTG_Tools.Texts
 
                     //Don't calculate actor speech's length
                     tmp = br.ReadBytes(stringLength);
-                    langdb.langdbs[i].actorSpeech = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmp);
+                    langdb.langdbs[i].actorSpeech = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmp);
 
                     if (langdb.isBlockLength)
                     {
@@ -88,7 +89,7 @@ namespace TTG_Tools.Texts
                     if (langdb.isBlockLength) langdb.newBlockLength += 4;
 
                     tmp = br.ReadBytes(stringLength);
-                    langdb.langdbs[i].anmFile = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmp);
+                    langdb.langdbs[i].anmFile = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmp);
                     if (langdb.isBlockLength) langdb.newBlockLength += stringLength;
 
                     if (langdb.isBlockLength)
@@ -101,7 +102,7 @@ namespace TTG_Tools.Texts
                     if (langdb.isBlockLength) langdb.newBlockLength += 4;
 
                     tmp = br.ReadBytes(stringLength);
-                    langdb.langdbs[i].voxFile = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(tmp);
+                    langdb.langdbs[i].voxFile = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(tmp);
                     if (langdb.isBlockLength) langdb.newBlockLength += stringLength;
 
                     langdb.flags[i] = new ClassesStructs.FlagsClass.LangdbFlagClass();
@@ -183,11 +184,11 @@ namespace TTG_Tools.Texts
                     bw.Write(langdb.langdbs[i].anmID);
                     bw.Write(langdb.langdbs[i].voxID);
 
-                    byte[] tmpActorName = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(langdb.langdbs[i].actorName);
+                    byte[] tmpActorName = Encoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(langdb.langdbs[i].actorName);
                     int actorNameLen = tmpActorName.Length;
                     int actorNameBlockLen = actorNameLen + 8;
 
-                    byte[] tmpActorSpeech = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(langdb.langdbs[i].actorSpeech);
+                    byte[] tmpActorSpeech = Encoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(langdb.langdbs[i].actorSpeech);
                     int actorSpeechLen = tmpActorSpeech.Length;
                     int actorSpeechBlockLen = tmpActorSpeech.Length + 8;
 
@@ -212,7 +213,7 @@ namespace TTG_Tools.Texts
                     int blockVoxLen = 0, blockAnmLen = 0;
                     int voxLen = 0, anmLen = 0;
 
-                    tmp = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(langdb.langdbs[i].anmFile);
+                    tmp = Encoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(langdb.langdbs[i].anmFile);
                     anmLen = tmp.Length;
                     blockAnmLen = anmLen + 8;
 
@@ -224,7 +225,7 @@ namespace TTG_Tools.Texts
                     bw.Write(anmLen);
                     bw.Write(tmp);
 
-                    tmp = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(langdb.langdbs[i].voxFile);
+                    tmp = Encoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(langdb.langdbs[i].voxFile);
                     voxLen = tmp.Length;
                     blockVoxLen = voxLen + 8;
 
@@ -266,7 +267,7 @@ namespace TTG_Tools.Texts
             {
                 index = -1;
 
-                if (MainMenu.settings.importingOfName)
+                if (AppData.settings.importingOfName)
                 {
                     index = type == 1 ? Methods.GetIndex(commonTexts, langdb.langdbs[i].anmID) : Methods.GetIndex(commonTexts, langdb.langdbs[i].stringNumber);
                     if(index != -1) langdb.langdbs[i].actorName = commonTexts[index].actorName;
@@ -279,7 +280,7 @@ namespace TTG_Tools.Texts
                     langdb.langdbs[i].actorSpeech = Methods.NormalizeImportedSpeechTranslationForCjk(translatedSpeech);
                 }
 
-                if(MainMenu.settings.newTxtFormat && MainMenu.settings.changeLangFlags && (index != -1))
+                if(AppData.settings.newTxtFormat && AppData.settings.changeLangFlags && (index != -1))
                 {
                     string tmpFlags = commonTexts[index].flags;
 
@@ -415,22 +416,22 @@ namespace TTG_Tools.Texts
                         ClassesStructs.Text.CommonText txt;
 
                         txt.isBothSpeeches = true;
-                        txt.strNumber = MainMenu.settings.exportRealID ? langdbs.langdbs[i].anmID : langdbs.langdbs[i].stringNumber;
+                        txt.strNumber = AppData.settings.exportRealID ? langdbs.langdbs[i].anmID : langdbs.langdbs[i].stringNumber;
                         txt.actorName = langdbs.langdbs[i].actorName;
                         txt.actorSpeechOriginal = langdbs.langdbs[i].actorSpeech;
                         txt.actorSpeechTranslation = langdbs.langdbs[i].actorSpeech;
                         txt.flags = Encoding.ASCII.GetString(langdbs.flags[i].flags);
 
-                        if (((txt.actorSpeechOriginal == "") && !MainMenu.settings.ignoreEmptyStrings)
+                        if (((txt.actorSpeechOriginal == "") && !AppData.settings.ignoreEmptyStrings)
                               || (txt.actorSpeechOriginal != "")) txts.txtList.Add(txt);
                     }
 
-                    if (MainMenu.settings.sortSameString) txts = Methods.SortString(txts);
+                    if (AppData.settings.sortSameString) txts = Methods.SortString(txts);
 
-                    string outputFile = MainMenu.settings.pathForOutputFolder + "\\" + fi.Name.Remove(fi.Name.Length - 6, 6);
-                    outputFile += MainMenu.settings.tsvFormat ? "tsv" : "txt";
+                    string outputFile = AppData.settings.pathForOutputFolder + "\\" + fi.Name.Remove(fi.Name.Length - 6, 6);
+                    outputFile += AppData.settings.tsvFormat ? "tsv" : "txt";
 
-                    switch (MainMenu.settings.newTxtFormat)
+                    switch (AppData.settings.newTxtFormat)
                     {
                         case true:
                             Texts.SaveText.NewMethod(txts.txtList, false, outputFile);
@@ -462,13 +463,13 @@ namespace TTG_Tools.Texts
                     ms = new MemoryStream(buffer);
                     br = new BinaryReader(ms);
 
-                    string outputFile = MainMenu.settings.pathForOutputFolder + Path.DirectorySeparatorChar + fi.Name;
+                    string outputFile = AppData.settings.pathForOutputFolder + Path.DirectorySeparatorChar + fi.Name;
 
                     int rebuildResult = RebuildLangdb(br, outputFile, langdbs);
 
                     result = "File " + fi.Name + " successfully imported.";
 
-                    if (MainMenu.settings.enableImportTextReplace && Methods.HasEnabledImportReplaceRules())
+                    if (AppData.settings.enableImportTextReplace && Methods.HasEnabledImportReplaceRules())
                     {
                         result += " ReplaceLog[O=" + transformStats.ReplacedInOriginal + ", T=" + transformStats.ReplacedInTranslation + ", Total=" + transformStats.TotalReplaced + "]";
                     }
@@ -483,11 +484,11 @@ namespace TTG_Tools.Texts
 
                     langdbs = null;
 
-                    if ((EncKey != null) || MainMenu.settings.encLangdb)
+                    if ((EncKey != null) || AppData.settings.encLangdb)
                     {
                         buffer = File.ReadAllBytes(outputFile);
 
-                        if ((EncKey != null) && !MainMenu.settings.encLangdb)
+                        if ((EncKey != null) && !AppData.settings.encLangdb)
                         {
                             if (Methods.meta_crypt(buffer, EncKey, version, false) != 0)
                             {
@@ -495,17 +496,17 @@ namespace TTG_Tools.Texts
                                 result += " Successfull encrypted back!";
                             }
                         }
-                        else if (MainMenu.settings.encLangdb)
+                        else if (AppData.settings.encLangdb)
                         {
-                            byte[] key = new byte[MainMenu.gamelist[MainMenu.settings.encKeyIndex].key.Length];
-                            Array.Copy(MainMenu.gamelist[MainMenu.settings.encKeyIndex].key, 0, key, 0, key.Length);
+                            byte[] key = new byte[AppData.gamelist[AppData.settings.encKeyIndex].key.Length];
+                            Array.Copy(AppData.gamelist[AppData.settings.encKeyIndex].key, 0, key, 0, key.Length);
 
-                            if(MainMenu.settings.customKey)
+                            if(AppData.settings.customKey)
                             {
-                                key = Methods.stringToKey(MainMenu.settings.encCustomKey);
+                                key = Methods.stringToKey(AppData.settings.encCustomKey);
                             }
 
-                            version = MainMenu.settings.versionEnc == 0 ? 2 : 7;
+                            version = AppData.settings.versionEnc == 0 ? 2 : 7;
                             
                             if (Methods.meta_crypt(buffer, key, version, false) != 0)
                             {
@@ -531,3 +532,5 @@ namespace TTG_Tools.Texts
         }
     }
 }
+
+

@@ -20,12 +20,12 @@ namespace TTG_Tools
         {
             edited = false; //Tell a program about first launch window form so font is not modified.
 
-            if (MainMenu.settings.swizzlePS4 || MainMenu.settings.swizzleNintendoSwitch || MainMenu.settings.swizzleXbox360 || MainMenu.settings.swizzlePSVita || MainMenu.settings.swizzleNintendoWii)
+            if (AppData.settings.swizzlePS4 || AppData.settings.swizzleNintendoSwitch || AppData.settings.swizzleXbox360 || AppData.settings.swizzlePSVita || AppData.settings.swizzleNintendoWii)
             {
-                if (MainMenu.settings.swizzlePS4) rbPS4Swizzle.Checked = true;
-                else if (MainMenu.settings.swizzlePSVita) rbPSVitaSwizzle.Checked = true;
-                else if (MainMenu.settings.swizzleXbox360) rbXbox360Swizzle.Checked = true;
-                else if (MainMenu.settings.swizzleNintendoWii) rbWiiSwizzle.Checked = true;
+                if (AppData.settings.swizzlePS4) rbPS4Swizzle.Checked = true;
+                else if (AppData.settings.swizzlePSVita) rbPSVitaSwizzle.Checked = true;
+                else if (AppData.settings.swizzleXbox360) rbXbox360Swizzle.Checked = true;
+                else if (AppData.settings.swizzleNintendoWii) rbWiiSwizzle.Checked = true;
                 else rbSwitchSwizzle.Checked = true;
             }
             else
@@ -307,8 +307,8 @@ namespace TTG_Tools
             {
                 for (int i = 0; i < ch1.Length; i++)
                 {
-                    int f = Convert.ToInt32(ASCIIEncoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(ch1[i].ToString())[0]);
-                    int s = Convert.ToInt32(ASCIIEncoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(ch2[i].ToString())[0]);
+                    int f = Convert.ToInt32(ASCIIEncoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(ch1[i].ToString())[0]);
+                    int s = Convert.ToInt32(ASCIIEncoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(ch2[i].ToString())[0]);
                     int first = 0;
                     int second = 0;
                     for (int j = 0; j < dataGridViewWithCoord.RowCount; j++)
@@ -347,8 +347,8 @@ namespace TTG_Tools
             {
                 for (int i = 0; i < ch2.Length; i++)
                 {
-                    int f = Convert.ToInt32(ASCIIEncoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(ch1[i].ToString())[0]);
-                    int s = Convert.ToInt32(ASCIIEncoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(ch2[i].ToString())[0]);
+                    int f = Convert.ToInt32(ASCIIEncoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(ch1[i].ToString())[0]);
+                    int s = Convert.ToInt32(ASCIIEncoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(ch2[i].ToString())[0]);
                     int first = 0;
                     int second = 0;
                     for (int j = 0; j < dataGridViewWithCoord.RowCount; j++)
@@ -658,13 +658,13 @@ namespace TTG_Tools
             }
 
             // Get the encoding of the search character
-            byte[] charBytes = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetBytes(searchChar);
+            byte[] charBytes = Encoding.GetEncoding(AppData.settings.ASCII_N).GetBytes(searchChar);
             uint charCode = 0;
 
             if (font.NewFormat)
             {
                 // New format: Use Unicode or ASCII
-                if (MainMenu.settings.unicodeSettings == 0)
+                if (AppData.settings.unicodeSettings == 0)
                 {
                     charBytes = Encoding.Unicode.GetBytes(searchChar);
                     if (charBytes.Length >= 2)
@@ -1021,44 +1021,44 @@ namespace TTG_Tools
 
         private void rbNoSwizzle_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.swizzleXbox360 = false;
-            MainMenu.settings.swizzlePS4 = false;
-            MainMenu.settings.swizzleNintendoSwitch = false;
-            MainMenu.settings.swizzlePSVita = false;
-            MainMenu.settings.swizzleNintendoWii = false;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.swizzleXbox360 = false;
+            AppData.settings.swizzlePS4 = false;
+            AppData.settings.swizzleNintendoSwitch = false;
+            AppData.settings.swizzlePSVita = false;
+            AppData.settings.swizzleNintendoWii = false;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void rbPS4Swizzle_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.swizzleXbox360 = false;
-            MainMenu.settings.swizzlePS4 = true;
-            MainMenu.settings.swizzleNintendoSwitch = false;
-            MainMenu.settings.swizzlePSVita = false;
-            MainMenu.settings.swizzleNintendoWii = false;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.swizzleXbox360 = false;
+            AppData.settings.swizzlePS4 = true;
+            AppData.settings.swizzleNintendoSwitch = false;
+            AppData.settings.swizzlePSVita = false;
+            AppData.settings.swizzleNintendoWii = false;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void rbSwitchSwizzle_CheckedChanged(object sender, EventArgs e)
         {
-            MainMenu.settings.swizzleXbox360 = false;
-            MainMenu.settings.swizzlePS4 = false;
-            MainMenu.settings.swizzleNintendoSwitch = true;
-            MainMenu.settings.swizzlePSVita = false;
-            MainMenu.settings.swizzleNintendoWii = false;
-            Settings.SaveConfig(MainMenu.settings);
+            AppData.settings.swizzleXbox360 = false;
+            AppData.settings.swizzlePS4 = false;
+            AppData.settings.swizzleNintendoSwitch = true;
+            AppData.settings.swizzlePSVita = false;
+            AppData.settings.swizzleNintendoWii = false;
+            Settings.SaveConfig(AppData.settings);
         }
 
         private void rbXbox360Swizzle_CheckedChanged(object sender, EventArgs e)
         {
             if (rbXbox360Swizzle.Checked)
             {
-                MainMenu.settings.swizzleXbox360 = true;
-                MainMenu.settings.swizzlePS4 = false;
-                MainMenu.settings.swizzleNintendoSwitch = false;
-                MainMenu.settings.swizzlePSVita = false;
-                MainMenu.settings.swizzleNintendoWii = false;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.swizzleXbox360 = true;
+                AppData.settings.swizzlePS4 = false;
+                AppData.settings.swizzleNintendoSwitch = false;
+                AppData.settings.swizzlePSVita = false;
+                AppData.settings.swizzleNintendoWii = false;
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
@@ -1066,12 +1066,12 @@ namespace TTG_Tools
         {
             if (rbPSVitaSwizzle.Checked)
             {
-                MainMenu.settings.swizzlePSVita = true;
-                MainMenu.settings.swizzlePS4 = false;
-                MainMenu.settings.swizzleNintendoSwitch = false;
-                MainMenu.settings.swizzleXbox360 = false;
-                MainMenu.settings.swizzleNintendoWii = false;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.swizzlePSVita = true;
+                AppData.settings.swizzlePS4 = false;
+                AppData.settings.swizzleNintendoSwitch = false;
+                AppData.settings.swizzleXbox360 = false;
+                AppData.settings.swizzleNintendoWii = false;
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
@@ -1079,12 +1079,12 @@ namespace TTG_Tools
         {
             if (rbWiiSwizzle.Checked)
             {
-                MainMenu.settings.swizzlePSVita = false;
-                MainMenu.settings.swizzlePS4 = false;
-                MainMenu.settings.swizzleNintendoSwitch = false;
-                MainMenu.settings.swizzleXbox360 = false;
-                MainMenu.settings.swizzleNintendoWii = true;
-                Settings.SaveConfig(MainMenu.settings);
+                AppData.settings.swizzlePSVita = false;
+                AppData.settings.swizzlePS4 = false;
+                AppData.settings.swizzleNintendoSwitch = false;
+                AppData.settings.swizzleXbox360 = false;
+                AppData.settings.swizzleNintendoWii = true;
+                Settings.SaveConfig(AppData.settings);
             }
         }
 
@@ -1122,3 +1122,4 @@ namespace TTG_Tools
         }
     }
 }
+

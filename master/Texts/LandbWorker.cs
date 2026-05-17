@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +7,7 @@ using TTG_Tools.ClassesStructs.Text;
 using System.IO;
 using System.Windows.Forms.VisualStyles;
 using System.Security.Cryptography;
+using TTG_Tools;
 
 namespace TTG_Tools.Texts
 {
@@ -160,7 +161,7 @@ namespace TTG_Tools.Texts
                     landb.landbs[i].actorNameSize = br.ReadInt32();
                     tmp = br.ReadBytes(landb.landbs[i].actorNameSize);
                     landb.landbs[i].actorName = Methods.DecodeGameText(tmp, landb.isUnicode);
-                    if (MainMenu.settings.supportTwdNintendoSwitch && landb.isUnicode)
+                    if (AppData.settings.supportTwdNintendoSwitch && landb.isUnicode)
                     {
                         landb.landbs[i].actorName = Methods.isUTF8String(tmp)
                             ? Encoding.UTF8.GetString(tmp)
@@ -174,7 +175,7 @@ namespace TTG_Tools.Texts
                     landb.landbs[i].actorSpeechSize = br.ReadInt32();
                     tmp = br.ReadBytes(landb.landbs[i].actorSpeechSize);
                     landb.landbs[i].actorSpeech = Methods.DecodeGameText(tmp, landb.isUnicode);
-                    if (MainMenu.settings.supportTwdNintendoSwitch && landb.isUnicode)
+                    if (AppData.settings.supportTwdNintendoSwitch && landb.isUnicode)
                     {
                         landb.landbs[i].actorSpeech = Methods.isUTF8String(tmp)
                             ? Encoding.UTF8.GetString(tmp)
@@ -356,7 +357,7 @@ namespace TTG_Tools.Texts
                     bw.Write(landb.landbs[i].zero2);
 
                     byte[] tmpActorName = Methods.EncodeGameText(landb.landbs[i].actorName, landb.isUnicode);
-                    if (MainMenu.settings.supportTwdNintendoSwitch && landb.isUnicode)
+                    if (AppData.settings.supportTwdNintendoSwitch && landb.isUnicode)
                     {
                         bool useUtf8ForActorName = true;
 
@@ -378,7 +379,7 @@ namespace TTG_Tools.Texts
                     landb.newLandbFileSize += 4 + landb.landbs[i].actorNameSize;
 
                     byte[] tmpActorSpeech = Methods.EncodeGameText(landb.landbs[i].actorSpeech, landb.isUnicode);
-                    if (MainMenu.settings.supportTwdNintendoSwitch && landb.isUnicode)
+                    if (AppData.settings.supportTwdNintendoSwitch && landb.isUnicode)
                     {
                         string speechText = landb.landbs[i].actorSpeech;
                         bool endsUtf8Marker = (speechText.IndexOf("(utf8)") > 0) && (speechText.IndexOf("(utf8)") == speechText.Length - 6);
@@ -497,7 +498,7 @@ namespace TTG_Tools.Texts
             for(int i = 0; i < landb.landbCount; i++)
             {
                 index = -1;
-                if (MainMenu.settings.importingOfName)
+                if (AppData.settings.importingOfName)
                 {
                     index = type == 1 ? Methods.GetIndex(commonTexts, landb.landbs[i].anmID) : Methods.GetIndex(commonTexts, landb.landbs[i].stringNumber);
                     if (index != -1) landb.landbs[i].actorName = commonTexts[index].actorName;
@@ -510,13 +511,13 @@ namespace TTG_Tools.Texts
                     landb.landbs[i].actorSpeech = Methods.NormalizeImportedSpeechTranslationForCjk(translatedSpeech);
                 }
 
-                if (landb.isUnicode && MainMenu.settings.unicodeSettings == 1) landb.landbs[i].actorSpeech = Methods.ConvertString(landb.landbs[i].actorSpeech, false);
-                /*if(landb.isUnicode && (MainMenu.settings.unicodeSettings == 2) && (landb.landbs[i].actorName.Contains("\""))) 
+                if (landb.isUnicode && AppData.settings.unicodeSettings == 1) landb.landbs[i].actorSpeech = Methods.ConvertString(landb.landbs[i].actorSpeech, false);
+                /*if(landb.isUnicode && (AppData.settings.unicodeSettings == 2) && (landb.landbs[i].actorName.Contains("\""))) 
                 {
                     landb.landbs[i].actorSpeech = Methods.ConvertString(landb.landbs[i].actorSpeech, false);
                 }*/
 
-                if(MainMenu.settings.newTxtFormat && MainMenu.settings.changeLangFlags
+                if(AppData.settings.newTxtFormat && AppData.settings.changeLangFlags
                     && (index != -1))
                 {
                     string tmpFlags = commonTexts[index].flags;
@@ -596,7 +597,7 @@ namespace TTG_Tools.Texts
                         ClassesStructs.Text.CommonText txt;
 
                         txt.isBothSpeeches = true;
-                        txt.strNumber = MainMenu.settings.exportRealID || MainMenu.settings.newTxtFormat ? landbs.landbs[i].anmID : landbs.landbs[i].stringNumber;
+                        txt.strNumber = AppData.settings.exportRealID || AppData.settings.newTxtFormat ? landbs.landbs[i].anmID : landbs.landbs[i].stringNumber;
                         txt.actorName = landbs.landbs[i].actorName;
                         txt.actorSpeechOriginal = landbs.landbs[i].actorSpeech;
                         txt.actorSpeechTranslation = landbs.landbs[i].actorSpeech;
@@ -607,16 +608,16 @@ namespace TTG_Tools.Texts
 
                         txt.flags = Encoding.ASCII.GetString(landbs.flags[i].flags);
 
-                        if (((txt.actorSpeechOriginal == "") && !MainMenu.settings.ignoreEmptyStrings)
+                        if (((txt.actorSpeechOriginal == "") && !AppData.settings.ignoreEmptyStrings)
                               || (txt.actorSpeechOriginal != "")) txts.txtList.Add(txt);
                     }
 
-                    if (MainMenu.settings.sortSameString) txts = Methods.SortString(txts);
+                    if (AppData.settings.sortSameString) txts = Methods.SortString(txts);
 
-                    string outputFile = MainMenu.settings.pathForOutputFolder + "\\" + fi.Name.Remove(fi.Name.Length - 5, 5);
-                    outputFile += MainMenu.settings.tsvFormat ? "tsv" : "txt";
+                    string outputFile = AppData.settings.pathForOutputFolder + "\\" + fi.Name.Remove(fi.Name.Length - 5, 5);
+                    outputFile += AppData.settings.tsvFormat ? "tsv" : "txt";
 
-                    switch(MainMenu.settings.newTxtFormat)
+                    switch(AppData.settings.newTxtFormat)
                     {
                         case true:
                             Texts.SaveText.NewMethod(txts.txtList, landbs.isUnicode, outputFile);
@@ -668,7 +669,7 @@ namespace TTG_Tools.Texts
                     ms = new MemoryStream(buffer);
                     br = new BinaryReader(ms);
 
-                    string outputFile = MainMenu.settings.pathForOutputFolder + "\\" + fi.Name;
+                    string outputFile = AppData.settings.pathForOutputFolder + "\\" + fi.Name;
 
                     int rebuildResult = RebuildLandb(br, outputFile, landbs, fi.Name, mapOpeningCreditsReplacement);
                     
@@ -677,7 +678,7 @@ namespace TTG_Tools.Texts
 
                     result = "File " + fi.Name + " successfully imported.";
 
-                    if (MainMenu.settings.enableImportTextReplace && Methods.HasEnabledImportReplaceRules())
+                    if (AppData.settings.enableImportTextReplace && Methods.HasEnabledImportReplaceRules())
                     {
                         result += " ReplaceLog[O=" + transformStats.ReplacedInOriginal + ", T=" + transformStats.ReplacedInTranslation + ", Total=" + transformStats.TotalReplaced + "]";
                     }
@@ -705,3 +706,5 @@ namespace TTG_Tools.Texts
         }
     }
 }
+
+

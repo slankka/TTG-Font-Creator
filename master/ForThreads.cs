@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,7 +58,7 @@ namespace TTG_Tools
             bool emptyFiles = true;
 
             // Salvar o caminho original configurado no MainMenu para restaurar depois
-            string originalGlobalOutputPath = MainMenu.settings.pathForOutputFolder;
+            string originalGlobalOutputPath = AppData.settings.pathForOutputFolder;
 
             // Lista para armazenar arquivos que falharam
             List<string> failedFiles = new List<string>();
@@ -88,7 +88,7 @@ namespace TTG_Tools
                             if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
 
                             // 3. HACK: Forçar a configuração global para a pasta alvo. 
-                            MainMenu.settings.pathForOutputFolder = targetFolder;
+                            AppData.settings.pathForOutputFolder = targetFolder;
 
                             int countCorrectWork = 0;
                             int countOfAllFiles = 0;
@@ -114,14 +114,14 @@ namespace TTG_Tools
                                 // we still need to trigger DoWork.
                                 if (fileDestination.Length == 0)
                                 {
-                                    if (destinationForExport == ".d3dtx" && whatImport == ".dds" && MainMenu.settings.swizzleNintendoWii)
+                                    if (destinationForExport == ".d3dtx" && whatImport == ".dds" && AppData.settings.swizzleNintendoWii)
                                     {
                                         string wiiPattern = q == 0
                                             ? onlyNameImporting + ".tpl"
                                             : onlyNameImporting + "(*)" + ".tpl";
                                         fileDestination = inputFiles[i].Directory.GetFiles(wiiPattern);
                                     }
-                                    else if (destinationForExport == ".font" && MainMenu.settings.swizzleNintendoWii)
+                                    else if (destinationForExport == ".font" && AppData.settings.swizzleNintendoWii)
                                     {
                                         string tplPattern = q == 0
                                             ? onlyNameImporting + ".tpl"
@@ -205,9 +205,9 @@ namespace TTG_Tools
                                                 break;
                                             case ".lua":
                                             case ".lenc":
-                                                if (MainMenu.settings.customKey)
+                                                if (AppData.settings.customKey)
                                                 {
-                                                    encKey = Methods.stringToKey(MainMenu.settings.encCustomKey);
+                                                    encKey = Methods.stringToKey(AppData.settings.encCustomKey);
                                                     if (encKey == null) { ReportForWork("You must enter key encryption!"); }
                                                 }
 
@@ -305,10 +305,10 @@ namespace TTG_Tools
                 if (emptyFiles) ReportForWork("Nothing to import. Empty folder.");
 
                 Methods.ImportTextTransformStats totalReplaceStats = Methods.GetImportReplaceTotals();
-                bool hasAnyTransformFeatureEnabled = MainMenu.settings.enableImportTextReplace
-                    || MainMenu.settings.removeBlanksBetweenCjkCharsInImport
-                    || MainMenu.settings.replaceDotToChinesePeriodInImport
-                    || MainMenu.settings.autoInsertSubtitleNewlineInImport;
+                bool hasAnyTransformFeatureEnabled = AppData.settings.enableImportTextReplace
+                    || AppData.settings.removeBlanksBetweenCjkCharsInImport
+                    || AppData.settings.replaceDotToChinesePeriodInImport
+                    || AppData.settings.autoInsertSubtitleNewlineInImport;
 
                 if (hasAnyTransformFeatureEnabled)
                 {
@@ -337,7 +337,7 @@ namespace TTG_Tools
                 Methods.SetNormalizeImportTextForCurrentOperation(false);
 
                 // RESTAURAR: Garante que o caminho original volte ao normal, mesmo se der erro
-                MainMenu.settings.pathForOutputFolder = originalGlobalOutputPath;
+                AppData.settings.pathForOutputFolder = originalGlobalOutputPath;
             }
         }
 
@@ -646,7 +646,7 @@ namespace TTG_Tools
             Methods.SetForceAnsiForCurrentOperation(useTwdNintendoSwitchAnsi);
 
             // Salvar o caminho original para restaurar depois
-            string originalGlobalOutputPath = MainMenu.settings.pathForOutputFolder;
+            string originalGlobalOutputPath = AppData.settings.pathForOutputFolder;
 
             try
             {
@@ -692,7 +692,7 @@ namespace TTG_Tools
                                 if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
 
                                 // 3. HACK: Forçar a configuração global para a pasta alvo.
-                                MainMenu.settings.pathForOutputFolder = targetFolder;
+                                AppData.settings.pathForOutputFolder = targetFolder;
 
                                 switch (destinationForExport)
                                 {
@@ -794,8 +794,9 @@ namespace TTG_Tools
                 Methods.SetForceAnsiForCurrentOperation(false);
 
                 // Restaurar configuração original
-                MainMenu.settings.pathForOutputFolder = originalGlobalOutputPath;
+                AppData.settings.pathForOutputFolder = originalGlobalOutputPath;
             }
         }
     }
 }
+

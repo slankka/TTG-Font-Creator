@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -261,7 +261,7 @@ namespace TTG_Tools
 
         private void checkDuplicatedStrsBtn_Click(object sender, EventArgs e)
         {
-            bool tmpTSVFormat = MainMenu.settings.tsvFormat;
+            bool tmpTSVFormat = AppData.settings.tsvFormat;
             List<CommonText> checkTxts;
 
             string filePath = firstPath.Text;
@@ -276,9 +276,9 @@ namespace TTG_Tools
                     if (checkTxts.Count > 0)
                     {
                         FileInfo fi = new FileInfo(readyFilePath);
-                        MainMenu.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
+                        AppData.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
 
-                        if (txtNewMethodRB.Checked && !MainMenu.settings.tsvFormat) Texts.SaveText.NewMethod(checkTxts, false, readyFilePath);
+                        if (txtNewMethodRB.Checked && !AppData.settings.tsvFormat) Texts.SaveText.NewMethod(checkTxts, false, readyFilePath);
                         else Texts.SaveText.OldMethod(checkTxts, true, false, readyFilePath);
 
                         MessageBox.Show("File successfully saved!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -305,7 +305,7 @@ namespace TTG_Tools
                             FileInfo tmpFI = new FileInfo(fi[i].FullName);
                             checkTxts = CheckStrings(fi[i].FullName);
 
-                            if (txtNewMethodRB.Checked && !MainMenu.settings.tsvFormat) Texts.SaveText.NewMethod(checkTxts, false, readyFilePath + "\\" + tmpFI.Name);
+                            if (txtNewMethodRB.Checked && !AppData.settings.tsvFormat) Texts.SaveText.NewMethod(checkTxts, false, readyFilePath + "\\" + tmpFI.Name);
                             else Texts.SaveText.OldMethod(checkTxts, true, false, readyFilePath + "\\" + tmpFI.Name);
                         }
 
@@ -318,7 +318,7 @@ namespace TTG_Tools
                 }
             }
 
-            MainMenu.settings.tsvFormat = tmpTSVFormat;
+            AppData.settings.tsvFormat = tmpTSVFormat;
         }
 
         private List<CommonText> MergeStrings(string originalPath, string translatePath)
@@ -384,18 +384,18 @@ namespace TTG_Tools
             if(singleFileRB.Checked && File.Exists(originalPath)
                 && File.Exists(translatePath) && Directory.Exists(readyPath))
             {
-                bool tmpTSV = MainMenu.settings.tsvFormat;
+                bool tmpTSV = AppData.settings.tsvFormat;
 
                 List<CommonText> result = MergeStrings(originalPath, translatePath);
 
                 FileInfo fi = new FileInfo(originalPath);
-                MainMenu.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
+                AppData.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
                 string newPath = readyPath + "\\" + fi.Name.Remove(fi.Name.Length - fi.Extension.Length, fi.Extension.Length) + "_merged" + fi.Extension;
 
-                if (txtNewMethodRB.Checked && !MainMenu.settings.tsvFormat) Texts.SaveText.NewMethod(result, false, newPath);
+                if (txtNewMethodRB.Checked && !AppData.settings.tsvFormat) Texts.SaveText.NewMethod(result, false, newPath);
                 else Texts.SaveText.OldMethod(result, true, false, newPath);
 
-                MainMenu.settings.tsvFormat = tmpTSV;
+                AppData.settings.tsvFormat = tmpTSV;
             }
             else if(severalFilesRB.Checked && Directory.Exists(originalPath)
                 && Directory.Exists(translatePath))
@@ -414,18 +414,18 @@ namespace TTG_Tools
                     {
                         if (translateFI[j].Name.IndexOf(originalFI[i].Name.Remove(originalFI[i].Name.Length - originalFI[i].Extension.Length, originalFI[i].Extension.Length)) == 0)
                         {
-                            bool tmpTSV = MainMenu.settings.tsvFormat;
+                            bool tmpTSV = AppData.settings.tsvFormat;
 
                             List<CommonText> result = MergeStrings(originalFI[i].FullName, translateFI[j].FullName);
 
                             FileInfo fi = new FileInfo(originalFI[i].FullName);
-                            MainMenu.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
+                            AppData.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
                             string newPath = readyPath + "\\" + fi.Name.Remove(fi.Name.Length - fi.Extension.Length, fi.Extension.Length) + "_merged" + fi.Extension;
 
-                            if (txtNewMethodRB.Checked && !MainMenu.settings.tsvFormat) Texts.SaveText.NewMethod(result, false, newPath);
+                            if (txtNewMethodRB.Checked && !AppData.settings.tsvFormat) Texts.SaveText.NewMethod(result, false, newPath);
                             else Texts.SaveText.OldMethod(result, true, false, newPath);
 
-                            MainMenu.settings.tsvFormat = tmpTSV;
+                            AppData.settings.tsvFormat = tmpTSV;
                         }
                     }
 
@@ -489,13 +489,13 @@ namespace TTG_Tools
                     {
                         FileInfo fi = new FileInfo(readyCheckedPath);
 
-                        bool tmpTSV = MainMenu.settings.tsvFormat;
-                        MainMenu.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
+                        bool tmpTSV = AppData.settings.tsvFormat;
+                        AppData.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
 
-                        if (txtNewMethodRB.Checked && !MainMenu.settings.tsvFormat) Texts.SaveText.NewMethod(result, false, fi.FullName);
+                        if (txtNewMethodRB.Checked && !AppData.settings.tsvFormat) Texts.SaveText.NewMethod(result, false, fi.FullName);
                         else Texts.SaveText.OldMethod(result, true, false, fi.FullName);
 
-                        MainMenu.settings.tsvFormat = tmpTSV;
+                        AppData.settings.tsvFormat = tmpTSV;
 
                         MessageBox.Show("File successfully saved!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -523,15 +523,15 @@ namespace TTG_Tools
                             {
                                 FileInfo tmpFi = new FileInfo(fi[i].FullName);
 
-                                bool tmpTSV = MainMenu.settings.tsvFormat;
-                                MainMenu.settings.tsvFormat = tmpFi.Extension.ToLower() == ".tsv";
+                                bool tmpTSV = AppData.settings.tsvFormat;
+                                AppData.settings.tsvFormat = tmpFi.Extension.ToLower() == ".tsv";
 
                                 string tmpFilePath = readyCheckedPath + "\\" + tmpFi.Name;
 
-                                if (txtNewMethodRB.Checked && !MainMenu.settings.tsvFormat) Texts.SaveText.NewMethod(result, false, tmpFilePath);
+                                if (txtNewMethodRB.Checked && !AppData.settings.tsvFormat) Texts.SaveText.NewMethod(result, false, tmpFilePath);
                                 else Texts.SaveText.OldMethod(result, true, false, tmpFilePath);
 
-                                MainMenu.settings.tsvFormat = tmpTSV;
+                                AppData.settings.tsvFormat = tmpTSV;
                             }
                         }
 
@@ -630,10 +630,10 @@ namespace TTG_Tools
                 if(readyStrs.Count > 0)
                 {
                     FileInfo fi = new FileInfo(firstDuplicatedPath);
-                    MainMenu.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
+                    AppData.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
                     string newPath = readyDuplicatedPath + "\\" + fi.Name.Remove(fi.Name.Length - fi.Extension.Length, fi.Extension.Length) + "_replaced" + fi.Extension;
 
-                    if (txtNewMethodRB.Checked && !MainMenu.settings.tsvFormat) Texts.SaveText.NewMethod(readyStrs, false, newPath);
+                    if (txtNewMethodRB.Checked && !AppData.settings.tsvFormat) Texts.SaveText.NewMethod(readyStrs, false, newPath);
                     else Texts.SaveText.OldMethod(readyStrs, true, false, newPath);
                 }
             }
@@ -676,10 +676,10 @@ namespace TTG_Tools
                     if (readyStrs.Count > 0)
                     {
                         FileInfo fi = new FileInfo(firstDuplicatedPath);
-                        MainMenu.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
+                        AppData.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
                         string newPath = readyDuplicatedPath + "\\" + fi.Name.Remove(fi.Name.Length - fi.Extension.Length, fi.Extension.Length) + "_replaced" + fi.Extension;
 
-                        if (txtNewMethodRB.Checked && !MainMenu.settings.tsvFormat) Texts.SaveText.NewMethod(readyStrs, false, newPath);
+                        if (txtNewMethodRB.Checked && !AppData.settings.tsvFormat) Texts.SaveText.NewMethod(readyStrs, false, newPath);
                         else Texts.SaveText.OldMethod(readyStrs, true, false, newPath);
                     }
                 }
@@ -818,13 +818,13 @@ namespace TTG_Tools
 
                         FileInfo fi = new FileInfo(SFD.FileName);
 
-                        bool tmpTSV = MainMenu.settings.tsvFormat;
-                        MainMenu.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
+                        bool tmpTSV = AppData.settings.tsvFormat;
+                        AppData.settings.tsvFormat = fi.Extension.ToLower() == ".tsv";
 
-                        if (txtNewMethodRB.Checked && !MainMenu.settings.tsvFormat) Texts.SaveText.NewMethod(newStrs, false, fi.FullName);
+                        if (txtNewMethodRB.Checked && !AppData.settings.tsvFormat) Texts.SaveText.NewMethod(newStrs, false, fi.FullName);
                         else Texts.SaveText.OldMethod(newStrs, false, false, fi.FullName);
 
-                        MainMenu.settings.tsvFormat = tmpTSV;
+                        AppData.settings.tsvFormat = tmpTSV;
 
                         MessageBox.Show("File successfully saved.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -837,3 +837,4 @@ namespace TTG_Tools
         }
     }
 }
+

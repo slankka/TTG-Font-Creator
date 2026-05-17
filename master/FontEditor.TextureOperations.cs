@@ -355,7 +355,7 @@ namespace TTG_Tools
                 {
                     dataGridViewWithCoord.Rows[i].HeaderCell.Value = Convert.ToString(i + 1);
                     dataGridViewWithCoord[0, i].Value = i;
-                    dataGridViewWithCoord[1, i].Value = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(BitConverter.GetBytes(i)).Replace("\0", string.Empty);
+                    dataGridViewWithCoord[1, i].Value = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(BitConverter.GetBytes(i)).Replace("\0", string.Empty);
                     dataGridViewWithCoord[2, i].Value = font.glyph.chars[i].XStart;
                     dataGridViewWithCoord[3, i].Value = font.glyph.chars[i].XEnd;
                     dataGridViewWithCoord[4, i].Value = font.glyph.chars[i].YStart;
@@ -395,9 +395,9 @@ namespace TTG_Tools
                     {
                         dataGridViewWithCoord[0, i].Value = font.glyph.charsNew[i].charId;
 
-                        dataGridViewWithCoord[1, i].Value = Encoding.GetEncoding(MainMenu.settings.ASCII_N).GetString(BitConverter.GetBytes(font.glyph.charsNew[i].charId)).Replace("\0", string.Empty);
+                        dataGridViewWithCoord[1, i].Value = Encoding.GetEncoding(AppData.settings.ASCII_N).GetString(BitConverter.GetBytes(font.glyph.charsNew[i].charId)).Replace("\0", string.Empty);
 
-                        if(MainMenu.settings.unicodeSettings == 0)
+                        if(AppData.settings.unicodeSettings == 0)
                         {
                             dataGridViewWithCoord[1, i].Value = Encoding.Unicode.GetString(BitConverter.GetBytes(font.glyph.charsNew[i].charId)).Replace("\0", string.Empty);
                         }

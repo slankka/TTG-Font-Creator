@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TTG_Tools.ClassesStructs.Text;
 using System.IO;
+using TTG_Tools;
 
 namespace TTG_Tools.Texts
 {
@@ -21,34 +22,34 @@ namespace TTG_Tools.Texts
 
                 for (int i = 0; i < txt.Count; i++)
                 {
-                    tmpString = MainMenu.settings.tsvFormat ? txt[i].strNumber + "\t" + txt[i].actorName + "\t" : txt[i].strNumber + ") " + txt[i].actorName + "\r\n";
+                    tmpString = AppData.settings.tsvFormat ? txt[i].strNumber + "\t" + txt[i].actorName + "\t" : txt[i].strNumber + ") " + txt[i].actorName + "\r\n";
                     tw.Write(tmpString);
                     tmpString = txt[i].actorSpeechOriginal;
 
                     if ((tmpString.Contains("\r") || tmpString.Contains("\n")) && !tmpString.Contains("\r\n"))
                     {
-                        if (tmpString.Contains("\r")) tmpString = MainMenu.settings.tsvFormat ? tmpString.Replace("\r", "\\r") : tmpString.Replace("\r", "\r\n");
-                        else tmpString = MainMenu.settings.tsvFormat ? tmpString.Replace("\n", "\\n") : tmpString.Replace("\n", "\r\n");
+                        if (tmpString.Contains("\r")) tmpString = AppData.settings.tsvFormat ? tmpString.Replace("\r", "\\r") : tmpString.Replace("\r", "\r\n");
+                        else tmpString = AppData.settings.tsvFormat ? tmpString.Replace("\n", "\\n") : tmpString.Replace("\n", "\r\n");
                     }
-                    else if (tmpString.Contains("\r\n") && MainMenu.settings.tsvFormat)
+                    else if (tmpString.Contains("\r\n") && AppData.settings.tsvFormat)
                     {
                         tmpString = tmpString.Replace("\r\n", "\\r\\n");
                     }
-                    else if (txt[i].actorSpeechOriginal.Contains("\t") && MainMenu.settings.tsvFormat)
+                    else if (txt[i].actorSpeechOriginal.Contains("\t") && AppData.settings.tsvFormat)
                     {
                         tmpString = tmpString.Replace("\t", "\\t");
                     }
 
-                    tmpString = isUnicode && MainMenu.settings.unicodeSettings == 1 ? Methods.ConvertString(tmpString, true) : tmpString;
+                    tmpString = isUnicode && AppData.settings.unicodeSettings == 1 ? Methods.ConvertString(tmpString, true) : tmpString;
 
                     tw.Write(tmpString);
 
                     if (isDoubledFile)
                     {
-                        tmpString = MainMenu.settings.tsvFormat ? "\t" : "\r\n";
+                        tmpString = AppData.settings.tsvFormat ? "\t" : "\r\n";
                         tw.Write(tmpString);
 
-                        if(!MainMenu.settings.tsvFormat)
+                        if(!AppData.settings.tsvFormat)
                         {
                             tmpString = txt[i].strNumber + ") " + txt[i].actorName + "\r\n";
                             tw.Write(tmpString);
@@ -58,19 +59,19 @@ namespace TTG_Tools.Texts
 
                         if ((tmpString.Contains("\r") || tmpString.Contains("\n")) && !tmpString.Contains("\r\n"))
                         {
-                            if (tmpString.Contains("\r")) tmpString = MainMenu.settings.tsvFormat ? tmpString.Replace("\r", "\\r") : tmpString.Replace("\r", "\r\n");
-                            else tmpString = MainMenu.settings.tsvFormat ? tmpString.Replace("\n", "\\n") : tmpString.Replace("\n", "\r\n");
+                            if (tmpString.Contains("\r")) tmpString = AppData.settings.tsvFormat ? tmpString.Replace("\r", "\\r") : tmpString.Replace("\r", "\r\n");
+                            else tmpString = AppData.settings.tsvFormat ? tmpString.Replace("\n", "\\n") : tmpString.Replace("\n", "\r\n");
                         }
-                        else if (tmpString.Contains("\r\n") && MainMenu.settings.tsvFormat)
+                        else if (tmpString.Contains("\r\n") && AppData.settings.tsvFormat)
                         {
                             tmpString = tmpString.Replace("\r\n", "\\r\\n");
                         }
-                        else if (tmpString.Contains("\t") && MainMenu.settings.tsvFormat)
+                        else if (tmpString.Contains("\t") && AppData.settings.tsvFormat)
                         {
                             tmpString = tmpString.Replace("\t", "\\t");
                         }
 
-                        tmpString = isUnicode && MainMenu.settings.unicodeSettings == 1 ? Methods.ConvertString(tmpString, true) : tmpString;
+                        tmpString = isUnicode && AppData.settings.unicodeSettings == 1 ? Methods.ConvertString(tmpString, true) : tmpString;
 
                         tw.Write(tmpString);
                     }
@@ -114,7 +115,7 @@ namespace TTG_Tools.Texts
                     if (tmpString.Contains("\t")) tmpString = tmpString.Replace("\t", "\\t");
                     tmpString += "\r\n";
 
-                    tmpString = isUnicode && MainMenu.settings.unicodeSettings == 1 ? Methods.ConvertString(tmpString, true) : tmpString;
+                    tmpString = isUnicode && AppData.settings.unicodeSettings == 1 ? Methods.ConvertString(tmpString, true) : tmpString;
                     sw.Write(tmpString);
 
                     tmpString = "speechTranslation=" + txt[i].actorSpeechTranslation;
@@ -123,7 +124,7 @@ namespace TTG_Tools.Texts
                     if (tmpString.Contains("\t")) tmpString = tmpString.Replace("\t", "\\t");
                     tmpString += "\r\n";
 
-                    tmpString = isUnicode && MainMenu.settings.unicodeSettings == 1 ? Methods.ConvertString(tmpString, true) : tmpString;
+                    tmpString = isUnicode && AppData.settings.unicodeSettings == 1 ? Methods.ConvertString(tmpString, true) : tmpString;
                     sw.Write(tmpString);
 
                     tmpString = "flags=" + txt[i].flags + "\r\n\r\n";
@@ -141,3 +142,5 @@ namespace TTG_Tools.Texts
         }
     }
 }
+
+

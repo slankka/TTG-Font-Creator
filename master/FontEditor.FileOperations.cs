@@ -268,7 +268,7 @@ private ClassesStructs.FontClass.ClassFont CreateEmptyNewFormatTemplateFont(stri
                         isNewFontMode = false;
                     try
                     {
-                        if (MainMenu.settings.swizzleNintendoWii
+                        if (AppData.settings.swizzleNintendoWii
                             && Path.GetExtension(selectedFontPath).Equals(".font", StringComparison.OrdinalIgnoreCase)
                             && Graphics.WiiSupport.TryLoadWiiFontForEditor(selectedFontPath, out wiiFontData))
                         {
@@ -936,10 +936,10 @@ private ClassesStructs.FontClass.ClassFont CreateEmptyNewFormatTemplateFont(stri
         public int FindStartOfStringSomething(byte[] array, int offset, string string_something)
         {
             int poz = offset;
-            while (Methods.ConvertHexToString(array, poz, string_something.Length, MainMenu.settings.ASCII_N, 1) != string_something)
+            while (Methods.ConvertHexToString(array, poz, string_something.Length, AppData.settings.ASCII_N, 1) != string_something)
             {
                 poz++;
-                if (Methods.ConvertHexToString(array, poz, string_something.Length, MainMenu.settings.ASCII_N, 1) == string_something)
+                if (Methods.ConvertHexToString(array, poz, string_something.Length, AppData.settings.ASCII_N, 1) == string_something)
                 {
                     return poz;
                 }
@@ -1387,3 +1387,4 @@ private ClassesStructs.FontClass.ClassFont CreateEmptyNewFormatTemplateFont(stri
         }
     }
 }
+

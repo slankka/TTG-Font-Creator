@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using TTG_Tools;
 
 namespace TTG_Tools
 {
@@ -36,27 +37,27 @@ namespace TTG_Tools
 
         private void buttonSaveSettings_Click(object sender, EventArgs e)
         {
-            MainMenu.settings.ASCII_N = (int)numericUpDownASCII.Value;
-            MainMenu.settings.pathForInputFolder = textBoxInputFolder.Text;
-            MainMenu.settings.pathForOutputFolder = textBoxOutputFolder.Text;
+            AppData.settings.ASCII_N = (int)numericUpDownASCII.Value;
+            AppData.settings.pathForInputFolder = textBoxInputFolder.Text;
+            AppData.settings.pathForOutputFolder = textBoxOutputFolder.Text;
             
-            if (rbNormalUnicode.Checked == true) MainMenu.settings.unicodeSettings = 0;
-            else if (rbNonNormalUnicode2.Checked == true) MainMenu.settings.unicodeSettings = 1;
-            else MainMenu.settings.unicodeSettings = 2;
+            if (rbNormalUnicode.Checked == true) AppData.settings.unicodeSettings = 0;
+            else if (rbNonNormalUnicode2.Checked == true) AppData.settings.unicodeSettings = 1;
+            else AppData.settings.unicodeSettings = 2;
 
-            MainMenu.settings.supportTwdNintendoSwitch = rbTwdNintendoSwitch.Checked;
+            AppData.settings.supportTwdNintendoSwitch = rbTwdNintendoSwitch.Checked;
 
             // Save scan text file paths
-            MainMenu.settings.scanTextFilePaths.Clear();
+            AppData.settings.scanTextFilePaths.Clear();
             foreach (var item in listBoxScanTextPaths.Items)
             {
-                MainMenu.settings.scanTextFilePaths.Add(item.ToString());
+                AppData.settings.scanTextFilePaths.Add(item.ToString());
             }
 
-            MainMenu.settings.languageIndex = -1;
+            AppData.settings.languageIndex = -1;
             if (checkLanguage.Checked)
             {
-                MainMenu.settings.languageIndex = languageComboBox.SelectedIndex;
+                AppData.settings.languageIndex = languageComboBox.SelectedIndex;
 
                 string selectedLanguage = languageComboBox.Text;
                 
@@ -72,7 +73,7 @@ namespace TTG_Tools
                         
                         if (int.TryParse(str_num, out int asciiValue) && asciiValue > 0)
                         {
-                            MainMenu.settings.ASCII_N = asciiValue;
+                            AppData.settings.ASCII_N = asciiValue;
                         }
                         else
                         {
@@ -91,18 +92,21 @@ namespace TTG_Tools
                     ApplyLanguageASCIIDefault(selectedLanguage);
                 }
 
-                numericUpDownASCII.Value = MainMenu.settings.ASCII_N;
+                numericUpDownASCII.Value = AppData.settings.ASCII_N;
             }
 
-            if (((MainMenu.settings.pathForInputFolder != "") && (Directory.Exists(MainMenu.settings.pathForInputFolder)))
-                && ((MainMenu.settings.pathForOutputFolder != "") && (Directory.Exists(MainMenu.settings.pathForOutputFolder))))
+            if (((AppData.settings.pathForInputFolder != "") && (Directory.Exists(AppData.settings.pathForInputFolder)))
+                && ((AppData.settings.pathForOutputFolder != "") && (Directory.Exists(AppData.settings.pathForOutputFolder))))
             {
-                Settings.SaveConfig(MainMenu.settings);
+                Settings.SaveConfig(AppData.settings);
 
                 if (Program.FirstTime)
                 {
-                    MessageBox.Show("Please restart application to confirm settings");
+                    // First-time setup: close settings and launch FontEditor
                     this.Close();
+                    Program.FirstTime = false;
+                    FontEditor fe = new FontEditor();
+                    fe.Show();
                 }
             }
             else
@@ -122,7 +126,7 @@ namespace TTG_Tools
             switch (languageName)
             {
                 case "Thai":
-                    MainMenu.settings.ASCII_N = 874;
+                    AppData.settings.ASCII_N = 874;
                     break;
 
                 case "Czech":
@@ -132,7 +136,7 @@ namespace TTG_Tools
                 case "Serbo-Croatian":
                 case "Montenegrin":
                 case "Gagauz":
-                    MainMenu.settings.ASCII_N = 1250;
+                    AppData.settings.ASCII_N = 1250;
                     break;
 
                 case "Belarusian":
@@ -141,7 +145,7 @@ namespace TTG_Tools
                 case "Russian":
                 case "Rusyn":
                 case "Ukrainian":
-                    MainMenu.settings.ASCII_N = 1251;
+                    AppData.settings.ASCII_N = 1251;
                     break;
 
                 case "Basque":
@@ -150,41 +154,41 @@ namespace TTG_Tools
                 case "Occitan":
                 case "Romansh":
                 case "Swahili":
-                    MainMenu.settings.ASCII_N = 1252;
+                    AppData.settings.ASCII_N = 1252;
                     break;
 
                 case "Dutch":
                 case "Greek":
-                    MainMenu.settings.ASCII_N = 1253;
+                    AppData.settings.ASCII_N = 1253;
                     break;
 
                 case "Turkish":
-                    MainMenu.settings.ASCII_N = 1254;
+                    AppData.settings.ASCII_N = 1254;
                     break;
 
                 case "Hebrew":
-                    MainMenu.settings.ASCII_N = 1255;
+                    AppData.settings.ASCII_N = 1255;
                     break;
 
                 case "Arabic":
                 case "Persian":
                 case "Urdu":
-                    MainMenu.settings.ASCII_N = 1256;
+                    AppData.settings.ASCII_N = 1256;
                     break;
 
                 case "Latvian":
                 case "Lithuanian":
                 case "Latgalian":
                 case "Icelandic":
-                    MainMenu.settings.ASCII_N = 1257;
+                    AppData.settings.ASCII_N = 1257;
                     break;
 
                 case "Vietnamese":
-                    MainMenu.settings.ASCII_N = 1258;
+                    AppData.settings.ASCII_N = 1258;
                     break;
 
                 default:
-                    MainMenu.settings.ASCII_N = 1252; // Safe default value
+                    AppData.settings.ASCII_N = 1252; // Safe default value
                     break;
             }
         }
@@ -230,7 +234,7 @@ namespace TTG_Tools
             {
                 rbNonNormalUnicode2.Enabled = true;
 
-                switch (MainMenu.settings.unicodeSettings)
+                switch (AppData.settings.unicodeSettings)
                 {
                     case 0:
                         rbNormalUnicode.Checked = true;
@@ -249,22 +253,22 @@ namespace TTG_Tools
 
         private void FormSettings_Load(object sender, EventArgs e)
         {
-            numericUpDownASCII.Value = MainMenu.settings.ASCII_N;
-            textBoxInputFolder.Text = MainMenu.settings.pathForInputFolder;
-            textBoxOutputFolder.Text = MainMenu.settings.pathForOutputFolder;
+            numericUpDownASCII.Value = AppData.settings.ASCII_N;
+            textBoxInputFolder.Text = AppData.settings.pathForInputFolder;
+            textBoxOutputFolder.Text = AppData.settings.pathForOutputFolder;
 
             buttonSaveSettings.Enabled = !Program.FirstTime;
 
-            foreach(string lang in MainMenu.languagesASCII)
+            foreach(string lang in AppData.languagesASCII)
             {
                 languageComboBox.Items.Add(lang);
             }
 
-            checkLanguage.Checked = MainMenu.settings.languageIndex != -1;
-            languageComboBox.Enabled = MainMenu.settings.languageIndex != -1;
-            languageComboBox.SelectedIndex = MainMenu.settings.languageIndex != -1 ? languageComboBox.SelectedIndex = MainMenu.settings.languageIndex : 0;
+            checkLanguage.Checked = AppData.settings.languageIndex != -1;
+            languageComboBox.Enabled = AppData.settings.languageIndex != -1;
+            languageComboBox.SelectedIndex = AppData.settings.languageIndex != -1 ? languageComboBox.SelectedIndex = AppData.settings.languageIndex : 0;
 
-            switch (MainMenu.settings.unicodeSettings)
+            switch (AppData.settings.unicodeSettings)
             {
                 case 1:
                     rbNonNormalUnicode2.Checked = true;
@@ -277,13 +281,13 @@ namespace TTG_Tools
                     break;
             }
 
-            rbTwdNintendoSwitch.Checked = MainMenu.settings.supportTwdNintendoSwitch;
+            rbTwdNintendoSwitch.Checked = AppData.settings.supportTwdNintendoSwitch;
 
             // Load scan text file paths
             listBoxScanTextPaths.Items.Clear();
-            if (MainMenu.settings.scanTextFilePaths != null)
+            if (AppData.settings.scanTextFilePaths != null)
             {
-                foreach (string path in MainMenu.settings.scanTextFilePaths)
+                foreach (string path in AppData.settings.scanTextFilePaths)
                 {
                     listBoxScanTextPaths.Items.Add(path);
                 }
@@ -360,3 +364,5 @@ namespace TTG_Tools
         }
     }
 }
+
+

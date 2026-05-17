@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using TTG_Tools;
 
 namespace TTG_Tools.Graphics
 {
@@ -11,12 +12,12 @@ namespace TTG_Tools.Graphics
             FileInfo fi = new FileInfo(inputFile);
 
             string wiiResult;
-            if (MainMenu.settings.swizzleNintendoWii && extract && WiiSupport.TryExtractWiiContainer(inputFile, MainMenu.settings.pathForOutputFolder, out wiiResult))
+            if (AppData.settings.swizzleNintendoWii && extract && WiiSupport.TryExtractWiiContainer(inputFile, AppData.settings.pathForOutputFolder, out wiiResult))
             {
                 return wiiResult;
             }
 
-            if (MainMenu.settings.swizzleNintendoWii && !extract && WiiSupport.TryRepackWiiContainer(inputFile, fi.DirectoryName, MainMenu.settings.pathForOutputFolder, out wiiResult))
+            if (AppData.settings.swizzleNintendoWii && !extract && WiiSupport.TryRepackWiiContainer(inputFile, fi.DirectoryName, AppData.settings.pathForOutputFolder, out wiiResult))
             {
                 return wiiResult;
             }
@@ -131,7 +132,7 @@ namespace TTG_Tools.Graphics
 
             if(extract)
             {
-                string outputFile = MainMenu.settings.pathForOutputFolder + Path.DirectorySeparatorChar + fi.Name.Remove(fi.Name.Length - 4, 4) + "ttf";
+                string outputFile = AppData.settings.pathForOutputFolder + Path.DirectorySeparatorChar + fi.Name.Remove(fi.Name.Length - 4, 4) + "ttf";
                 File.WriteAllBytes(outputFile, font);
                 return "File " + fi.Name + " successfully extracted";
             }
@@ -142,9 +143,9 @@ namespace TTG_Tools.Graphics
             blockFontSize += diff;
             fontSize += diff;
 
-            if (File.Exists(MainMenu.settings.pathForOutputFolder + "\\" + fi.Name)) File.Delete(MainMenu.settings.pathForOutputFolder + "\\" + fi.Name);
+            if (File.Exists(AppData.settings.pathForOutputFolder + "\\" + fi.Name)) File.Delete(AppData.settings.pathForOutputFolder + "\\" + fi.Name);
 
-            fs = new FileStream(MainMenu.settings.pathForOutputFolder + "\\" + fi.Name, FileMode.CreateNew);
+            fs = new FileStream(AppData.settings.pathForOutputFolder + "\\" + fi.Name, FileMode.CreateNew);
             BinaryWriter bw = new BinaryWriter(fs);
             bw.Write(header);
             bw.Write(blockSize);
@@ -173,3 +174,5 @@ namespace TTG_Tools.Graphics
         }
     }
 }
+
+
