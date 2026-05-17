@@ -118,136 +118,93 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="richTextBox1.Text" xml:space="preserve">
-    <value>TTG Tools 
-By Den Em (Е.Д.В.) and Pashok6798
-Modded by Krisp and HeitorSpectre (from Den Em's and Pashok6798 agreement)
-Source code on:
-GitHub: https://github.com/HeitorSpectre/TTG-Tools
-Check all releases here: https://github.com/HeitorSpectre/TTG-Tools/releases
-(Original developer's e-mail: d3n123@rambler.ru)
+    <value>TTG Font Builder
+========================================
+A specialized tool for Telltale Games font editing,
+with Archive Packer &amp; Unpacker as auxiliary utilities.
+
+Based on TTG Tools by Den Em (Е.Д.В.) and Pashok6798.
+Originally modded by Krisp and HeitorSpectre.
+Fork enhanced by Arvin (github.com/ArvinZHC).
+
+Source code:
+GitHub: https://github.com/ArvinZHC/TTG-Font-Builder
 
 Special thanks to:
+- Den Em for accepting to upload his source code.
+- Aluigi for source code of ttarchext.
+- Taylor Hornby for C# source code of Blowfish encryption.
+- Gdkchan, Stella/AboodXD for Nintendo Switch swizzle method.
+- Daemon1 and tge for PS4 swizzle algorithm.
+- Josh Tamely for Oodle wrapper.
+- Hajin Jang for Zlib.Wrapper.
+- Nemiroff for fixing bugs in the Font Editor.
+- Krisp for Xbox texture support and font editing with Swizzle.
+- Pashok6798 for his support to the community.
+- BennyBoy for the Poker Night Remastered encryption key.
 
-- Den Em for accept to upload his source code.
-- Aluigi for source code of ttarchext;
-- Taylor Hornby for C# source code of Blowfish encryption
-- Gdkchan, Stella/AboodXD for swizzle method of Nintendo Switch
-- Daemon1 and tge for PS4 swizzle algorithm
-- Josh Tamely for oodle wrapper
-- Hajin Jang for Zlib.Wrapper
-- Nemiroff thanks for fixing a bug in the Font Editor.
-- Krisp for adding Xbox texture support and font editing with Swizzle.  
-- Pashok6798 for all your support to the community and for trusting us.
-- BennyBoy for sending the encryption key for Poker Night at the Inventory - Remastered
+========================================
+FEATURES
 
-List of supported games:
-Telltale's Texas Hold Em, Tales of Monkey Island, Sam &amp; Max: Season One, Sam &amp; Max: Season Two, Wallace and Gromit's Grand Adventures, CSI: Deadly Intent, Sam &amp; Max: The Devil's Playhouse, Puzzle Agent 1, CSI: Fatal Conspiracy, Poker Night at the Inventory, Back to the Future: The Game, Strong Bad, Hector: The Badge of Carnage, Puzzle Agent 2, Jurassic Park: The Game, The Walking Dead, Poker Night 2, The Wolf Among Us, The Walking Dead Season Two, Tales from the Borderlands, Game of Thrones - A Telltale Games Series, Minecraft: Story Mode (Seasons One and Two), The Walking Dead: Michonne, Batman (Seasons One and Two), The Walking Dead: The Final Season, The Walking Dead : The Telltale Definitive Series, Sam &amp; Max Save the World Remastered, Sam &amp; Max Beyond Time and Space Remastered, Sam &amp; Max The Devil's Playhouse Remastered and Poker Night at the Inventory - Remastered.
-Maybe some games doesn't work.
+[Font Editor - Core]
+- Load/edit/save .font files (5VSM / 6VSM / ERTM)
+- Multi-page texture support (DDS import/export)
+- Coordinate editor with real-time preview
+- Character generator with system font picker (TTF/OTF)
+- Missing character detection &amp; auto generation
+- Smart gap-filling on texture pages
+- FNT import/export
+- YOffset &amp; YAdjust batch controls
+- Profile system (save/load settings per font)
+- Drag-and-drop .font loading
+- Swizzle support: Nintendo Switch, PS4, PS Vita, Xbox 360, Nintendo Wii
 
-===
+[Font Editor - Switch Compatibility]
+- Full NewFormat font creation pipeline (New -&gt; Import FNT -&gt; Import DDS -&gt; Save)
+- Hardware texture parameter block auto-injection
+- Header fix: offset 0x08 always 0 (structural separator)
+- FontName protection on FNT import
+
+[Archive Packer]
+- Pack folders into ttarch / ttarch2 archives
+- Oodle LZHLW &amp; Kraken compression
+- Encryption key selection (40+ games)
+- Last chunk padding control
+
+[Archive Unpacker]
+- Extract ttarch / ttarch2 archives
+- Auto-detect game encryption keys
+- Search filter &amp; format filter
+- Oodle Kraken decompression support
+- Ttarch2 Scanner: browse archive contents without extraction
+
+========================================
+Supported games:
+Telltale Texas Hold'em, Bone, Sam &amp; Max (all seasons + Remastered),
+Strong Bad, Wallace &amp; Gromit, Tales of Monkey Island, Hector,
+Puzzle Agent 1 &amp; 2, Poker Night 1 &amp; 2 (+ Remastered),
+Back to the Future, CSI (3D, Hard Evidence, Deadly Intent, Fatal Conspiracy),
+Jurassic Park, Law &amp; Order: Legacies,
+The Walking Dead (S1-S4, Michonne, Definitive Series),
+The Wolf Among Us, Tales from the Borderlands,
+Game of Thrones, Minecraft: Story Mode (S1 &amp; S2),
+Batman (S1 &amp; S2), Guardians of the Galaxy.
+
+========================================
 [Version history]
 
-v.1.15.9 (16.03.2026)
-+ TTG Tools:
-Added a Mod Creator.
-+ Mod Creator:
-Initial support for Poker Night at the Inventory - Remastered and Sam &amp; Max: Save the World - Remastered.
-
-v.1.15.8 (08.03.2026)
-+ TTG Tools:
-Added support for the game Poker Night at the Inventory - Remastered.
-
-v.1.15.7 (16.02.2026)
-+ Auto(De)Packer
-Add Nintendo Switch-specific text encoding mode for TWD (.prop/.landb)
-Fix texture swizzle bug for Nintendo Switch
-+ Font Editor: 
-Added support for The Walking Dead Season One on Nintendo Switch
-
-v.1.15.6 (16.02.2026)
-+ Archive Packer 
-Added support for The Walking Dead Season One on PS Vita
-+ Font Editor: 
-Add live texture preview overlay to Font Editor
-
-v.1.15.5 (13.02.2026)
-+ Archive Packer
-Lua encryption has been fixed when a .lenc file is present during the building of a ttarch.
-+ TTG Tools:
-An updater has been added inside the tool.
-
-v.1.15.4 (11.02.2026)
-+ Auto(De)Packer:
-Added PS Vita swizzle support
-Added the option to insert a DDS file into PS Vita textures instead of a PVR, which the game will read correctly.
-+ Font Editor:
-Added PS Vita swizzle support.
-Added drag and drop.
-+ Archive Unpacker and Archive Packer:
-Added drag and drop.
-+ TTG Tools:
-Replaced the folder browser dialog with the Common Open File Dialog for improved usability.
-
-v.1.15.3 (06.02.2026)
-+ Archive Packer
-Added a fix to reimport the ttarch2 from the Sam &amp; Max: Remastered's games.
-
-v.1.15.2 (06.02.2026)
-+ Auto(De)Packer (Packer and Unpacker)
-Fixed an issue with reinserting PS4 textures.
-Subfolder processing during Decrypt/Export and Encrypt/Pack/Import files.
-Added error log with pop-up.
-+ Archive Packer
-Added drag and drop functionality to the Archive Packer.
-
-v.1.15.1 (14.11.2025)
-+ Auto(De)Packer (Packer and Unpacker)
-Fixing a chronic issue that causes bugs in the reinsertion of some Xbox 360 textures.
-
-v.1.15.0 (10.11.2025)
-+ TTG Tools:
-The issue that prevented saving settings has been fixed.
-
-v.1.14.9 (19.08.2025)
-+ Auto(De)Packer (Packer and Unpacker)
-Added support for Xbox 360 texture extraction and reinsertion  
-+ Font editor:
-Added support for Xbox 360 font editing  
-
-v.1.14.8 (19.07.2025)
-+ TTG Tools:
-Fixed the names of the games
-+ Font editor:
-Removed russian messages.
-
-v.1.14.7 (05.07.2025)
-+ Auto(De)Packer (Packer and Unpacker)
-Fixed an encoding bug where Latin characters were showing up as "?" in Back To The Future: The Game on Xbox 360 and PS4.
-+ Font editor:
-Added Nemiroff's fixes to the official TTG Tools build.
-+ TTG Tools:
-Removed russian messages.
-
-v.1.14.6 (24.02.2025)
-+ Font editor:
-Nemiroff fixed some critical bugs in the Font Editor. (Many thanks!)
-
-v.1.14.5 (05.01.2025)
-+ Auto(De)Packer
-Minor fixes import text files.
-
-v.1.14.4 (16.11.2024)
-+ Archive packer:
-Fix packing ttarch archives with version 9
-+ Auto(De)Packer and Font editor:
-Add support ps3 textures for oldest games (not completely tested!)
-+ Text editor:
-Minor fixes with progress bars
-+ Archive packer:
-Minor fixes
-+ Archive unpacker:
-Minor fixes.
-Add support search files in archive.
+v.1.16.0 (2026-05)
++ Font Editor is now a standalone app: TTG Font Builder
++ Menu bar: Tools (Archive Packer/Unpacker), Settings, Help (About)
++ Y Adjust batch control for all character Y coordinates
++ FNT adjust group box with YOffset + YAdj controls
++ Enhanced Switch font compatibility &amp; NewFormat pipeline fixes
++ Archive Unpacker: Ttarch2 Scanner, Oodle Kraken support
++ Archive Packer: Oodle compression, padding control
++ Profile system: save/load font editing settings
++ Font Picker: system font search, TTF/OTF browsing, CJK-friendly
++ CJK fallback, smart gap-filling, regeneration support
++ Texture preview overlay and drag-and-drop support
 
 v.1.14.3 (19.10.2024)
 + Auto(De)Packer:
@@ -1129,4 +1086,3 @@ That's all... and only start!</value>
   </data>
 
 </root>
-
