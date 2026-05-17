@@ -1,8 +1,20 @@
-# TTG Tools
+# TTG Font Creator
 
-A utility for modifying files from Telltale Games, including texts (.landb, .langdb, .dlog, .prop), textures (.d3dtx) for PC, Xbox 360, PS4, PS3, PS Vita, Nintendo Switch, Nintendo Wii, iOS and Android, fonts (.font), as well as extracting and creating archive files (.ttarch, .ttarch2, .obb). Supports decryption of .lua and .lenc files.
+**TTG Font Creator** is a specialized font editor for Telltale Games, designed to create, modify, and fine-tune `.font` files used across multiple platforms including **Nintendo Switch**, PC, PS3, PS4, PS Vita, Xbox 360, Wii, iOS and Android.
 
-Based on [TTG Tools by Den Em and Pashok6798](https://github.com/zenderovpaulo95/TTG-Tools), with additional modifications.
+Re-designed and re-implemented Font Editor, originally based on [TTG Tools](https://github.com/HeitorSpectre/TTG-Tools) by Den Em and Pashok6798.
+
+## Why TTG Font Creator
+
+Telltale's `.font` binary format (5VSM/6VSM/ERTM) stores glyph textures, character metrics, and layout parameters in a platform-specific structure. Creating compatible fonts for fan translations or modding requires precise control over:
+
+- **BMFont → .font conversion**: Import `.fnt` files and associated DDS textures, with automatic platform detection and swizzle settings
+- **FNT header parameters**: `info size` (point size), `common lineHeight` (line spacing), `common base` (baseline / vertical text position) — all preserved and editable through the FNT Adjust panel
+- **Texture pipeline**: Multi-page DDS (BC3/DXT5) support, platform-specific texture headers (block layouts, swizzle flags), ObjectName/SubObjectName generation
+- **Character metrics**: Per-glyph X/Y offsets, advance widths, UV coordinates, channel assignments — batch-adjustable via the FNT Adjust panel
+- **Chinese / CJK support**: Full UTF-8 encoding for FontName and ObjectName — Chinese font names (e.g. 思源黑体 Heavy) survive save/reopen round-trips
+- **Create fonts from scratch**: `New → Import FNT → Import DDS → Save` — build a complete, game-ready `.font` file with no existing source required, generating all texture headers, element tables, and platform-specific metadata automatically
+- **Text-centric workflow**: Designed around a complete fan translation pipeline — **Unpack** archives (ttarch/ttarch2) → **Develop fonts** (create, import, adjust, save) + **Normalize landb text** (CJK spacing, punctuation, line-break fixes) → **Pack** back into archives. Every tool in the **Tools** menu is organized to serve this workflow.
 
 ## Recent Changes
 
@@ -51,9 +63,12 @@ Based on [TTG Tools by Den Em and Pashok6798](https://github.com/zenderovpaulo95
 ### Archive Packer
 ![Archive Packer](images/Archive_Packer.png)
 
+### Auto(DePacker)
+![Auto(De)Packer](images/Auto(De)Packer.png)
+
 ### Font Editor
-![Font Editor](images/FontEditor-SecondAtlasSupply.png)
-![Font Editor Settings](images/FontEditorSettings.png)
+![TTG Font Creator](images/FontCreator.gif)
+![TTG Font Tools](images/FontCreator-Tools.png)
 
 ## Features
 

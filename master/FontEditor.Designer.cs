@@ -44,6 +44,7 @@ namespace TTG_Tools
             this.archivePackerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.archiveUnpackerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ttarch2ScannerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoPackerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quickToolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsFormToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -231,6 +232,7 @@ namespace TTG_Tools
             this.archivePackerToolStripMenuItem,
             this.archiveUnpackerToolStripMenuItem,
             this.ttarch2ScannerToolStripMenuItem,
+            this.autoPackerToolStripMenuItem,
             this.quickToolsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(52, 21);
@@ -256,6 +258,13 @@ namespace TTG_Tools
             this.ttarch2ScannerToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
             this.ttarch2ScannerToolStripMenuItem.Text = "Ttarch2 Scanner";
             this.ttarch2ScannerToolStripMenuItem.Click += new System.EventHandler(this.ttarch2ScannerToolStripMenuItem_Click);
+            // 
+            // autoPackerToolStripMenuItem
+            // 
+            this.autoPackerToolStripMenuItem.Name = "autoPackerToolStripMenuItem";
+            this.autoPackerToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+            this.autoPackerToolStripMenuItem.Text = "Auto (De)Packer";
+            this.autoPackerToolStripMenuItem.Click += new System.EventHandler(this.autoPackerToolStripMenuItem_Click);
             // 
             // quickToolsToolStripMenuItem
             // 
@@ -1266,6 +1275,7 @@ namespace TTG_Tools
         private System.Windows.Forms.ToolStripMenuItem archivePackerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem archiveUnpackerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ttarch2ScannerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem autoPackerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quickToolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsFormToolStripMenuItem;

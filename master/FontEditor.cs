@@ -165,5 +165,14 @@ namespace TTG_Tools
                 dialog.ShowDialog(this);
             }
         }
+
+        private void autoPackerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Application.OpenForms.OfType<AutoPacker>().Count() == 0)
+            {
+                Form packerForm = new AutoPacker();
+                packerForm.Show();
+            }
+        }
     }
 }
