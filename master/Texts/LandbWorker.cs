@@ -13,7 +13,7 @@ namespace TTG_Tools.Texts
 {
     public class LandbWorker
     {
-        private static LandbClass GetStringsFromLandb(BinaryReader br, bool hasCRC64Langres, bool newFormat, bool isUnicode)
+        public static LandbClass GetStringsFromLandb(BinaryReader br, bool hasCRC64Langres, bool newFormat, bool isUnicode)
         {
             LandbClass landb = new LandbClass();
 
@@ -247,7 +247,7 @@ namespace TTG_Tools.Texts
             return landb;
         }
 
-        private static int RebuildLandb(BinaryReader br, string outputFile, LandbClass landb, string inputFileName, bool openingCreditsReplacementMode)
+        public static int RebuildLandb(BinaryReader br, string outputFile, LandbClass landb, string inputFileName, bool openingCreditsReplacementMode)
         {
             if (File.Exists(outputFile)) File.Delete(outputFile);
 
@@ -469,7 +469,7 @@ namespace TTG_Tools.Texts
             }
         }
 
-        private static int CheckNumbers(List<CommonText> txts, LandbClass landb)
+        public static int CheckNumbers(List<CommonText> txts, LandbClass landb)
         {
             int result = -1;
             int countLangres = 0;
@@ -492,7 +492,7 @@ namespace TTG_Tools.Texts
 
         
 
-        private static LandbClass ReplaceStrings(LandbClass landb, List<CommonText> commonTexts, int type)
+        public static LandbClass ReplaceStrings(LandbClass landb, List<CommonText> commonTexts, int type)
         {
             int index;
             for(int i = 0; i < landb.landbCount; i++)
@@ -703,6 +703,152 @@ namespace TTG_Tools.Texts
 
             GC.Collect();
             return result;
+        }
+
+        /// <summary>
+        /// 解析 .landb 文件为 LandbClass（不经过 TXT 中转），供编辑器使用。
+        /// </summary>
+        public static LandbClass LoadLandbFromFile(string filePath, out bool isUnicode, out bool mapOpeningCredits, out string errorMessage)
+        {
+            isUnicode = false;
+            mapOpeningCredits = false;
+            errorMessage = null;
+
+            FileInfo fi = new FileInfo(filePath);
+            byte[] buffer = File.ReadAllBytes(filePath);
+            mapOpeningCredits = Methods.ShouldMapOpeningCreditsReplacement(fi.Name, buffer);
+
+            try
+            {
+                MemoryStream ms = new MemoryStream(buffer);
+                BinaryReader br = new BinaryReader(ms);
+
+                byte[] checkHeader = br.ReadBytes(4);
+
+                bool newFormat = false;
+                bool hasCRC64Langres = false;
+                int pos = 4;
+
+                if ((Encoding.ASCII.GetString(checkHeader) == "5VSM") || (Encoding.ASCII.GetString(checkHeader) == "6VSM"))
+                {
+                    newFormat = true;
+                    pos = 16;
+                }
+
+                br.BaseStream.Seek(pos, SeekOrigin.Begin);
+
+                int countBlocks = br.ReadInt32();
+                for (int i = 0; i < countBlocks; i++)
+                {
+                    byte[] tmp = br.ReadBytes(8);
+                    string classId = BitConverter.ToString(tmp);
+                    if (classId == "B0-9F-D8-63-34-02-4F-00") hasCRC64Langres = true;
+                    if (classId == "53-DC-A5-33-DB-D6-DC-7E") isUnicode = true;
+                    br.ReadBytes(4);
+                }
+
+                LandbClass landbs = GetStringsFromLandb(br, hasCRC64Langres, newFormat, isUnicode);
+                br.Close();
+                ms.Close();
+
+                if (landbs == null)
+                {
+                    errorMessage = "File " + fi.Name + ": unknown error.";
+                    return null;
+                }
+                if (landbs.landbCount == 0)
+                {
+                    errorMessage = fi.Name + " is EMPTY.";
+                    return null;
+                }
+
+                return landbs;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "Error loading " + fi.Name + ": " + ex.Message;
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 将 LandbClass 的条目转换为 CommonText 列表，供编辑器 DataGridView 显示。
+        /// strNumber 使用 anmID，保证与旧/newTxtFormat 导出一致。
+        /// </summary>
+        public static List<CommonText> LandbToCommonTextList(LandbClass landb, bool mapOpeningCredits)
+        {
+            List<CommonText> txtList = new List<CommonText>();
+
+            for (int i = 0; i < landb.landbCount; i++)
+            {
+                CommonText txt;
+                txt.isBothSpeeches = true;
+                txt.strNumber = landb.landbs[i].anmID;
+                txt.actorName = landb.landbs[i].actorName;
+                txt.actorSpeechOriginal = landb.landbs[i].actorSpeech;
+                txt.actorSpeechTranslation = landb.landbs[i].actorSpeech;
+
+                txt.actorName = Methods.MapReplacementCharToCopyright(txt.actorName, mapOpeningCredits);
+                txt.actorSpeechOriginal = Methods.MapReplacementCharToCopyright(txt.actorSpeechOriginal, mapOpeningCredits);
+                txt.actorSpeechTranslation = Methods.MapReplacementCharToCopyright(txt.actorSpeechTranslation, mapOpeningCredits);
+
+                txt.flags = Encoding.ASCII.GetString(landb.flags[i].flags);
+
+                txtList.Add(txt);
+            }
+
+            return txtList;
+        }
+
+        /// <summary>
+        /// 将编辑后的 CommonText 列表保存回 .landb 文件。
+        /// originalPath 用于读取原始头信息，outputPath 为写入目标。
+        /// </summary>
+        public static string SaveLandbToFile(string originalPath, string outputPath, LandbClass landb, List<CommonText> texts, bool mapOpeningCredits)
+        {
+            FileInfo fi = new FileInfo(originalPath);
+
+            try
+            {
+                // 反向 copyright 映射
+                if (mapOpeningCredits && texts != null)
+                {
+                    for (int i = 0; i < texts.Count; i++)
+                    {
+                        CommonText tmpTxt = texts[i];
+                        tmpTxt.actorName = Methods.MapCopyrightToReplacementChar(tmpTxt.actorName, true);
+                        tmpTxt.actorSpeechOriginal = Methods.MapCopyrightToReplacementChar(tmpTxt.actorSpeechOriginal, true);
+                        tmpTxt.actorSpeechTranslation = Methods.MapCopyrightToReplacementChar(tmpTxt.actorSpeechTranslation, true);
+                        texts[i] = tmpTxt;
+                    }
+                }
+
+                // 确定匹配类型
+                int type = CheckNumbers(texts, landb);
+                if (type == -1) return "I don't know which type of number strings select for " + fi.Name + " file.";
+
+                // 应用编辑到 LandbClass
+                landb = ReplaceStrings(landb, texts, type);
+
+                // 重新打开原始文件用于读取头信息
+                byte[] buffer = File.ReadAllBytes(originalPath);
+                MemoryStream ms = new MemoryStream(buffer);
+                BinaryReader br = new BinaryReader(ms);
+
+                int rebuildResult = RebuildLandb(br, outputPath, landb, fi.Name, mapOpeningCredits);
+
+                br.Close();
+                ms.Close();
+
+                if (rebuildResult == -1)
+                    return "Unknown error while rebuild file " + fi.Name;
+
+                return "File " + fi.Name + " successfully saved.";
+            }
+            catch (Exception ex)
+            {
+                return "Error saving " + fi.Name + ": " + ex.Message;
+            }
         }
     }
 }

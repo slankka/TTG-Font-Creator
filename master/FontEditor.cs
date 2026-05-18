@@ -174,5 +174,14 @@ namespace TTG_Tools
                 packerForm.Show();
             }
         }
+
+        private void landbEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Application.OpenForms.OfType<LandbEditor>().Count() == 0)
+            {
+                Form landbEditor = new LandbEditor();
+                landbEditor.Show();
+            }
+        }
     }
 }

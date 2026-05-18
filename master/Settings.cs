@@ -86,6 +86,8 @@ namespace TTG_Tools
 
         private int _languageIndex;
         private System.Collections.Generic.List<string> _scanTextFilePaths;
+        private string _landbEditorLastDirA;
+        private string _landbEditorLastDirB;
 
         [XmlAttribute("pathForInputFolder")]
         public string pathForInputFolder
@@ -690,6 +692,20 @@ namespace TTG_Tools
             {
                 _scanTextFilePaths = value;
             }
+        }
+
+        [XmlAttribute("landbEditorLastDirA")]
+        public string landbEditorLastDirA
+        {
+            get { return _landbEditorLastDirA; }
+            set { _landbEditorLastDirA = value; }
+        }
+
+        [XmlAttribute("landbEditorLastDirB")]
+        public string landbEditorLastDirB
+        {
+            get { return _landbEditorLastDirB; }
+            set { _landbEditorLastDirB = value; }
         }
 
         public Settings(

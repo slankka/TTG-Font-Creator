@@ -46,6 +46,7 @@ namespace TTG_Tools
             this.ttarch2ScannerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoPackerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quickToolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.landbEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsFormToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -233,7 +234,8 @@ namespace TTG_Tools
             this.archiveUnpackerToolStripMenuItem,
             this.ttarch2ScannerToolStripMenuItem,
             this.autoPackerToolStripMenuItem,
-            this.quickToolsToolStripMenuItem});
+            this.quickToolsToolStripMenuItem,
+            this.landbEditorToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(52, 21);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -272,6 +274,13 @@ namespace TTG_Tools
             this.quickToolsToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
             this.quickToolsToolStripMenuItem.Text = "Quick Tools...";
             this.quickToolsToolStripMenuItem.Click += new System.EventHandler(this.quickToolsToolStripMenuItem_Click);
+            // 
+            // landbEditorToolStripMenuItem
+            // 
+            this.landbEditorToolStripMenuItem.Name = "landbEditorToolStripMenuItem";
+            this.landbEditorToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
+            this.landbEditorToolStripMenuItem.Text = "Landb Editor";
+            this.landbEditorToolStripMenuItem.Click += new System.EventHandler(this.landbEditorToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
@@ -1277,6 +1286,7 @@ namespace TTG_Tools
         private System.Windows.Forms.ToolStripMenuItem ttarch2ScannerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem autoPackerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quickToolsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem landbEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsFormToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;

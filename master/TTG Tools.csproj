@@ -222,6 +222,12 @@
     <Compile Include="Graphics\TextureWorker.cs" />
     <Compile Include="ClassesStructs\Text\CommonTextClass.cs" />
     <Compile Include="Texts\DlogWorker.cs" />
+    <Compile Include="LandbEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LandbEditor.Designer.cs">
+      <DependentUpon>LandbEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Texts\LandbWorker.cs" />
     <Compile Include="Texts\LangdbWorker.cs" />
     <Compile Include="Texts\ReadText.cs" />
@@ -266,6 +272,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormSettings.resx">
       <DependentUpon>FormSettings.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LandbEditor.resx">
+      <DependentUpon>LandbEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="TextEditor.resx">
