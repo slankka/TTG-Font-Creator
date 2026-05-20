@@ -19,12 +19,32 @@ namespace TTG_Tools
         private bool _mapCreditsA, _mapCreditsB;
         private bool _isDirtyA, _isDirtyB;
 
+        // Find/Replace state
+        private FindReplaceDialog _findReplaceDlg;
+        private int _lastSearchRowA = -1;
+        private int _lastSearchRowB = -1;
+        private string _lastSearchTextA = "";
+        private string _lastSearchTextB = "";
+
+        /// <summary>Static reference for child dialogs (e.g. FindReplaceDialog).</summary>
+        internal static LandbEditor ActiveInstance { get; private set; }
+
         public LandbEditor()
         {
             InitializeComponent();
+            ActiveInstance = this;
+            InitFindReplace();
             HookSyncScroll();
             HookEditingControls();
             RestoreLastDirectories();
+        }
+
+        private void InitFindReplace()
+        {
+            _findReplaceDlg = new FindReplaceDialog();
+            _findReplaceDlg.FindNextClicked += OnFindNextClicked;
+            _findReplaceDlg.ReplaceClicked += OnReplaceClicked;
+            _findReplaceDlg.ReplaceAllClicked += OnReplaceAllClicked;
         }
 
         private void HookEditingControls()
@@ -121,6 +141,322 @@ namespace TTG_Tools
                 if (_gridViewB.ContainsFocus) Save('B');
                 else Save('A');
             }
+            else if (e.Control && e.KeyCode == Keys.F)
+            {
+                e.SuppressKeyPress = true;
+                OpenFindReplace(findMode: true);
+            }
+            else if (e.Control && e.KeyCode == Keys.H)
+            {
+                e.SuppressKeyPress = true;
+                OpenFindReplace(findMode: false);
+            }
+            else if (e.KeyCode == Keys.F3)
+            {
+                e.SuppressKeyPress = true;
+                FindNext();
+            }
+        }
+
+        // ========== Find / Replace ==========
+
+        /// <summary>Which side is currently active (has focus in its grid).</summary>
+        private char ActiveSide
+        {
+            get
+            {
+                if (_gridViewA.ContainsFocus) return 'A';
+                if (_gridViewB.ContainsFocus) return 'B';
+                return 'A'; // default
+            }
+        }
+
+        /// <summary>Gets the grid and last-search state for a side.</summary>
+        private void GetSearchState(char side, out DataGridView grid, out int lastRow, out string lastText)
+        {
+            if (side == 'A')
+            {
+                grid = _gridViewA; lastRow = _lastSearchRowA; lastText = _lastSearchTextA;
+            }
+            else
+            {
+                grid = _gridViewB; lastRow = _lastSearchRowB; lastText = _lastSearchTextB;
+            }
+        }
+
+        private void SetSearchState(char side, int lastRow, string lastText)
+        {
+            if (side == 'A') { _lastSearchRowA = lastRow; _lastSearchTextA = lastText; }
+            else { _lastSearchRowB = lastRow; _lastSearchTextB = lastText; }
+        }
+
+        private void OpenFindReplace(bool findMode)
+        {
+            char activeSide = ActiveSide;
+            string selectedText = GetSelectedText(activeSide);
+            _findReplaceDlg.Open(selectedText ?? "", activeSide);
+
+            // Position the dialog to the right of the parent form
+            if (!_findReplaceDlg.Visible || _findReplaceDlg.Location.IsEmpty)
+            {
+                _findReplaceDlg.StartPosition = FormStartPosition.Manual;
+                _findReplaceDlg.Location = new System.Drawing.Point(
+                    this.Location.X + this.Width - _findReplaceDlg.Width - 50,
+                    this.Location.Y + 80);
+            }
+        }
+
+        private string GetSelectedText(char side)
+        {
+            var grid = side == 'A' ? _gridViewA : _gridViewB;
+            if (grid?.CurrentCell != null)
+            {
+                string value = grid.CurrentCell.Value?.ToString() ?? "";
+                if (!string.IsNullOrEmpty(value))
+                {
+                    // If a portion is selected, return that; otherwise return whole cell
+                    if (grid.EditingControl is TextBox tb && !string.IsNullOrEmpty(tb.SelectedText))
+                        return tb.SelectedText;
+                }
+            }
+            return "";
+        }
+
+        // ---- Menu / button handlers ----
+
+        private void OnFindOpen(object sender, EventArgs e) => OpenFindReplace(findMode: true);
+        private void OnReplaceOpen(object sender, EventArgs e) => OpenFindReplace(findMode: false);
+        private void OnFindNextMenu(object sender, EventArgs e) => FindNext();
+
+        // ---- Dialog event handlers ----
+
+        private void OnFindNextClicked(object sender, EventArgs e)
+        {
+            char side = _findReplaceDlg.Side;
+            GetSearchState(side, out var grid, out int lastRow, out _);
+            int startRow = (lastRow >= 0 && lastRow < grid.Rows.Count) ? lastRow + 1 : 0;
+            int found = FindInGrid(grid, _findReplaceDlg.FindText, startRow, _findReplaceDlg.MatchCase);
+            if (found >= 0)
+            {
+                SetSearchState(side, found, _findReplaceDlg.FindText);
+                SelectCell(grid, found);
+                _findReplaceDlg.ShowStatus($"Found at row {found}");
+            }
+            else
+            {
+                _findReplaceDlg.ShowStatus("Not found", isError: true);
+            }
+        }
+
+        private void OnReplaceClicked(object sender, EventArgs e)
+        {
+            char side = _findReplaceDlg.Side;
+            GetSearchState(side, out var grid, out int lastRow, out _);
+            string findText = _findReplaceDlg.FindText;
+            string replaceText = _findReplaceDlg.ReplaceText;
+            bool matchCase = _findReplaceDlg.MatchCase;
+
+            if (string.IsNullOrEmpty(findText)) return;
+
+            // If we have a current match, replace it first
+            if (lastRow >= 0 && lastRow < grid.Rows.Count)
+            {
+                string currentVal = grid.Rows[lastRow].Cells[1].Value?.ToString() ?? "";
+                StringComparison cmp = matchCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                if (currentVal.IndexOf(findText, cmp) >= 0)
+                {
+                    string newVal = ReplaceFirst(currentVal, findText, replaceText, cmp);
+                    grid.Rows[lastRow].Cells[1].Value = newVal;
+                    OnCellChanged(side);
+                }
+            }
+
+            // Then find next
+            int startRow = (lastRow >= 0 && lastRow < grid.Rows.Count) ? lastRow + 1 : 0;
+            int found = FindInGrid(grid, findText, startRow, matchCase);
+            if (found >= 0)
+            {
+                SetSearchState(side, found, findText);
+                SelectCell(grid, found);
+                _findReplaceDlg.ShowStatus($"Replaced, next at row {found}");
+            }
+            else
+            {
+                SetSearchState(side, -1, findText);
+                _findReplaceDlg.ShowStatus("Replaced, no more matches", isError: true);
+            }
+        }
+
+        private void OnReplaceAllClicked(object sender, EventArgs e)
+        {
+            char side = _findReplaceDlg.Side;
+            GetSearchState(side, out var grid, out _, out _);
+            string findText = _findReplaceDlg.FindText;
+            string replaceText = _findReplaceDlg.ReplaceText;
+            bool matchCase = _findReplaceDlg.MatchCase;
+
+            if (string.IsNullOrEmpty(findText))
+            {
+                _findReplaceDlg.ShowStatus("Nothing to find", isError: true);
+                return;
+            }
+
+            StringComparison cmp = matchCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+            int count = 0;
+            for (int r = 0; r < grid.Rows.Count; r++)
+            {
+                string value = grid.Rows[r].Cells[1].Value?.ToString() ?? "";
+                if (value.IndexOf(findText, cmp) >= 0)
+                {
+                    string newVal = value.Replace(findText, replaceText);
+                    // Respect match case for replacement
+                    if (!matchCase)
+                    {
+                        // Use case-insensitive replace
+                        newVal = ReplaceAllIgnoreCase(value, findText, replaceText);
+                    }
+                    grid.Rows[r].Cells[1].Value = newVal;
+                    count++;
+                }
+            }
+
+            if (count > 0)
+            {
+                OnCellChanged(side);
+                SetSearchState(side, -1, findText);
+                _findReplaceDlg.ShowStatus($"Replaced {count} occurrence(s)");
+                Log($"Side {side}: Replaced All - {count} occurrence(s) of \"{findText}\"");
+            }
+            else
+            {
+                _findReplaceDlg.ShowStatus("No matches found", isError: true);
+            }
+        }
+
+        // ========== Core find logic ==========
+
+        /// <summary>Performs Find Next using the last search text from the dialog (for F3).</summary>
+        private void FindNext()
+        {
+            if (_findReplaceDlg == null || string.IsNullOrEmpty(_findReplaceDlg.FindText))
+            {
+                // No previous search; open Find dialog
+                OpenFindReplace(findMode: true);
+                return;
+            }
+
+            char side = _findReplaceDlg.Side;
+            GetSearchState(side, out var grid, out int lastRow, out string lastText);
+
+            // If search text changed, reset
+            if (lastText != _findReplaceDlg.FindText)
+            {
+                lastRow = -1;
+            }
+
+            int startRow = (lastRow >= 0 && lastRow < grid.Rows.Count) ? lastRow + 1 : 0;
+            int found = FindInGrid(grid, _findReplaceDlg.FindText, startRow, _findReplaceDlg.MatchCase);
+            if (found >= 0)
+            {
+                SetSearchState(side, found, _findReplaceDlg.FindText);
+                SelectCell(grid, found);
+                _findReplaceDlg.ShowStatus($"Found at row {found}");
+            }
+            else
+            {
+                // Wrap-around: try from beginning
+                if (startRow > 0)
+                {
+                    found = FindInGrid(grid, _findReplaceDlg.FindText, 0, _findReplaceDlg.MatchCase);
+                    if (found >= 0)
+                    {
+                        SetSearchState(side, found, _findReplaceDlg.FindText);
+                        SelectCell(grid, found);
+                        _findReplaceDlg.ShowStatus($"Wrapped - found at row {found}");
+                        return;
+                    }
+                }
+                _findReplaceDlg.ShowStatus("Not found", isError: true);
+            }
+        }
+
+        /// <summary>Searches the Value column (index 1) of a DataGridView for text.</summary>
+        /// <returns>The row index of the first match, or -1 if not found.</returns>
+        private static int FindInGrid(DataGridView grid, string searchText, int startRow, bool matchCase)
+        {
+            if (grid == null || grid.Rows.Count == 0 || string.IsNullOrEmpty(searchText))
+                return -1;
+
+            StringComparison cmp = matchCase ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+            int totalRows = grid.Rows.Count;
+
+            // Clamp start row
+            if (startRow < 0) startRow = 0;
+            if (startRow >= totalRows) startRow = 0;
+
+            // Search from startRow to end
+            for (int r = startRow; r < totalRows; r++)
+            {
+                string value = grid.Rows[r].Cells[1].Value?.ToString() ?? "";
+                if (value.IndexOf(searchText, cmp) >= 0)
+                    return r;
+            }
+
+            // Wrap around: search from 0 to startRow - 1
+            for (int r = 0; r < startRow; r++)
+            {
+                string value = grid.Rows[r].Cells[1].Value?.ToString() ?? "";
+                if (value.IndexOf(searchText, cmp) >= 0)
+                    return r;
+            }
+
+            return -1;
+        }
+
+        /// <summary>Selects a cell in the grid and scrolls to it.</summary>
+        private static void SelectCell(DataGridView grid, int rowIndex)
+        {
+            if (grid == null || rowIndex < 0 || rowIndex >= grid.Rows.Count) return;
+
+            grid.ClearSelection();
+            grid.CurrentCell = grid.Rows[rowIndex].Cells[1];
+
+            // Ensure the row is visible
+            if (rowIndex < grid.FirstDisplayedScrollingRowIndex ||
+                rowIndex >= grid.FirstDisplayedScrollingRowIndex + grid.DisplayedRowCount(false))
+            {
+                grid.FirstDisplayedScrollingRowIndex = Math.Max(0, rowIndex - 5);
+            }
+        }
+
+        /// <summary>Replaces the first occurrence of oldValue with newValue in text.</summary>
+        private static string ReplaceFirst(string text, string oldValue, string newValue, StringComparison cmp)
+        {
+            int idx = text.IndexOf(oldValue, cmp);
+            if (idx < 0) return text;
+            return text.Substring(0, idx) + newValue + text.Substring(idx + oldValue.Length);
+        }
+
+        /// <summary>Case-insensitive replace all.</summary>
+        private static string ReplaceAllIgnoreCase(string text, string oldValue, string newValue)
+        {
+            if (string.IsNullOrEmpty(oldValue)) return text;
+
+            var sb = new System.Text.StringBuilder();
+            int pos = 0;
+            while (pos < text.Length)
+            {
+                int idx = text.IndexOf(oldValue, pos, StringComparison.OrdinalIgnoreCase);
+                if (idx < 0)
+                {
+                    sb.Append(text.Substring(pos));
+                    break;
+                }
+                sb.Append(text.Substring(pos, idx - pos));
+                sb.Append(newValue);
+                pos = idx + oldValue.Length;
+            }
+            return sb.ToString();
         }
 
         // ========== Directory ==========
@@ -480,7 +816,14 @@ namespace TTG_Tools
                 var r = MessageBox.Show($"Unsaved: {string.Join(", ", dirty)}.\n\nSave before closing?", "Unsaved Changes",
                     MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
                 if (r == DialogResult.Yes) { if (_isDirtyA) Save('A'); if (_isDirtyB) Save('B'); }
-                else if (r == DialogResult.Cancel) { e.Cancel = true; }
+                else if (r == DialogResult.Cancel) { e.Cancel = true; return; }
+            }
+            // Clean up modeless dialog
+            if (_findReplaceDlg != null && !_findReplaceDlg.IsDisposed)
+            {
+                _findReplaceDlg.Close();
+                _findReplaceDlg.Dispose();
+                _findReplaceDlg = null;
             }
         }
 
