@@ -18,6 +18,7 @@ namespace TTG_Tools
     public partial class FindInFilesDialog : Form
     {
         private BackgroundWorker _worker;
+        private BackgroundWorker _replaceWorker;
         private List<FindInFilesMatch> _allMatches;
         private string _currentRootDir;
 
@@ -30,6 +31,7 @@ namespace TTG_Tools
             InitializeComponent();
             InitWorker();
             _chkSpeechTranslation.Checked = true;
+            _chkSpeechOriginal.Checked = true;
         }
 
         /// <summary>
@@ -66,6 +68,15 @@ namespace TTG_Tools
             _worker.DoWork += Worker_DoWork;
             _worker.ProgressChanged += Worker_ProgressChanged;
             _worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+
+            _replaceWorker = new BackgroundWorker
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = false
+            };
+            _replaceWorker.DoWork += ReplaceWorker_DoWork;
+            _replaceWorker.ProgressChanged += ReplaceWorker_ProgressChanged;
+            _replaceWorker.RunWorkerCompleted += ReplaceWorker_RunWorkerCompleted;
         }
 
         // ===== Properties =====
@@ -96,7 +107,11 @@ namespace TTG_Tools
         private void OnFindAll(object sender, EventArgs e) => StartSearch(replaceMode: false);
         private void OnReplacePreview(object sender, EventArgs e) => StartSearch(replaceMode: true);
         private void OnApplyReplace(object sender, EventArgs e) => ExecuteReplace();
-        private void OnClose(object sender, EventArgs e) => Hide();
+        private void OnClose(object sender, EventArgs e)
+        {
+            Hide();
+            (Owner as Form)?.Activate();
+        }
 
         private void OnBrowseDir(object sender, EventArgs e)
         {
@@ -133,7 +148,7 @@ namespace TTG_Tools
             if (keyData == Keys.Escape)
             {
                 if (_worker.IsBusy) _worker.CancelAsync();
-                else Hide();
+                else { Hide(); (Owner as Form)?.Activate(); }
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
@@ -295,11 +310,15 @@ namespace TTG_Tools
 
             PopulateResults(_allMatches, isReplace);
 
+            // Use deduplicated entry count (speechOriginal == speechTranslation for same position)
+            int uniqueMatches = _allMatches
+                .GroupBy(m => new { m.FilePath, m.EntryIndex, m.MatchPosition })
+                .Count();
             int fileCount = _allMatches.Select(m => m.FilePath).Distinct().Count();
             string modeLabel = isReplace ? "replace preview" : "found";
-            SetStatus($"{modeLabel}: {_allMatches.Count} matches in {fileCount} file(s)");
+            SetStatus($"{modeLabel}: {uniqueMatches} unique matches in {fileCount} file(s)");
 
-            if (isReplace && _allMatches.Count > 0)
+            if (isReplace && uniqueMatches > 0)
                 _btnApplyReplace.Enabled = true;
         }
 
@@ -310,28 +329,32 @@ namespace TTG_Tools
             _listResults.BeginUpdate();
             _listResults.Items.Clear();
 
-            foreach (var m in matches)
+            var entryGroups = matches.GroupBy(m => new { m.RelativePath, m.EntryIndex });
+            foreach (var g in entryGroups)
             {
+                var first = g.First();
+                string fields = string.Join(", ", g.Select(m => m.FieldName).Distinct());
+
                 string preview;
                 if (replaceMode && !string.IsNullOrEmpty(_txtReplace.Text))
                 {
-                    string before = Truncate(m.FullValue, 60);
-                    string after = Truncate(
-                        m.FullValue.Substring(0, m.MatchPosition) +
-                        _txtReplace.Text +
-                        m.FullValue.Substring(m.MatchPosition + m.MatchLength), 60);
-                    preview = $"{before}  →  {after}";
+                    string before = Truncate(first.FullValue, 60);
+                    // Apply ALL match positions (descending) to get the complete after text
+                    string after = first.FullValue;
+                    foreach (var m in g.Select(m => m.MatchPosition).Distinct().OrderByDescending(p => p))
+                        after = after.Substring(0, m) + _txtReplace.Text + after.Substring(m + first.MatchLength);
+                    preview = $"{Truncate(before, 50)}  →  {Truncate(after, 50)}";
                 }
                 else
                 {
-                    preview = Truncate(m.FullValue, 80);
+                    preview = Truncate(first.FullValue, 80);
                 }
 
-                var item = new ListViewItem(m.RelativePath);
-                item.SubItems.Add((m.EntryIndex + 1).ToString());
-                item.SubItems.Add(m.FieldName);
+                var item = new ListViewItem(first.RelativePath);
+                item.SubItems.Add((first.EntryIndex + 1).ToString());
+                item.SubItems.Add(fields);
                 item.SubItems.Add(preview);
-                item.Tag = m;
+                item.Tag = first;
                 _listResults.Items.Add(item);
             }
 
@@ -352,75 +375,167 @@ namespace TTG_Tools
             string replaceText = _txtReplace.Text;
 
             var filesToModify = _allMatches.GroupBy(m => m.FilePath).ToList();
-            string confirmMsg = $"Replace {_allMatches.Count} occurrence(s) in {filesToModify.Count} file(s)?\n\nThis will overwrite .landb files.";
+            int uniqueMatches = _allMatches
+                .GroupBy(m => new { m.FilePath, m.EntryIndex, m.MatchPosition })
+                .Count();
+            string confirmMsg = $"Replace {uniqueMatches} unique occurrence(s) in {filesToModify.Count} file(s)?\n\nThis will overwrite .landb files.";
             if (MessageBox.Show(this, confirmMsg, "Confirm Replace All",
                 MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK)
                 return;
 
             _btnApplyReplace.Enabled = _btnFindAll.Enabled = _btnReplacePreview.Enabled = false;
 
-            int successFiles = 0, failFiles = 0;
-            int totalReplaced = 0;
+            // Mark all result items as pending
+            foreach (ListViewItem item in _listResults.Items)
+                item.BackColor = SystemColors.Window;
 
-            foreach (var group in filesToModify)
+            _replaceWorker.RunWorkerAsync(new ReplaceArgs
             {
+                FilesToModify = filesToModify,
+                ReplaceText = replaceText,
+                AllMatches = _allMatches
+            });
+        }
+
+        private void ReplaceWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var args = (ReplaceArgs)e.Argument;
+            var results = new ReplaceResults();
+
+            for (int i = 0; i < args.FilesToModify.Count; i++)
+            {
+                var group = args.FilesToModify[i];
                 string filePath = group.Key;
+                string fileName = Path.GetFileName(filePath);
+
+                _replaceWorker.ReportProgress((i + 1) * 100 / args.FilesToModify.Count,
+                    new ReplaceProgress { FileName = fileName, Phase = "writing" });
+
                 try
                 {
                     bool isUnicode, mapCredits; string errorMsg;
                     var landb = LandbWorker.LoadLandbFromFile(filePath, out isUnicode, out mapCredits, out errorMsg);
-                    if (landb == null) { failFiles++; continue; }
+                    if (landb == null) { results.FailFiles++; continue; }
 
                     var texts = LandbWorker.LandbToCommonTextList(landb, mapCredits);
-                    if (texts == null) { failFiles++; continue; }
+                    if (texts == null) { results.FailFiles++; continue; }
 
                     int fileReplaceCount = 0;
-                    foreach (var match in group)
+
+                    foreach (var entryGroup in group.GroupBy(m => m.EntryIndex))
                     {
-                        if (match.EntryIndex >= texts.Count) continue;
-                        var t = texts[match.EntryIndex];
-                        SetFieldValue(t, match.FieldName, match.FullValue, match.MatchPosition,
-                            match.MatchLength, replaceText);
-                        fileReplaceCount++;
+                        int ei = entryGroup.Key;
+                        if (ei >= texts.Count) continue;
+
+                        var t = texts[ei];
+                        string currentText = GetFieldValue(t, entryGroup.First().FieldName);
+                        string fieldName = entryGroup.First().FieldName;
+
+                        var uniquePositions = entryGroup
+                            .Select(m => m.MatchPosition)
+                            .Distinct()
+                            .OrderByDescending(p => p);
+
+                        foreach (int pos in uniquePositions)
+                        {
+                            int matchLen = entryGroup.First().MatchLength;
+                            if (pos < 0 || pos + matchLen > currentText.Length) continue;
+
+                            currentText = currentText.Substring(0, pos)
+                                         + args.ReplaceText
+                                         + currentText.Substring(pos + matchLen);
+                            fileReplaceCount++;
+                        }
+
+                        if (fieldName == "speechOriginal" || fieldName == "speechTranslation")
+                        {
+                            t.actorSpeechOriginal = currentText;
+                            t.actorSpeechTranslation = currentText;
+                        }
+                        else
+                        {
+                            SetFieldFromText(ref t, fieldName, currentText);
+                        }
+                        texts[ei] = t;
                     }
 
                     if (fileReplaceCount > 0)
                     {
                         string saveResult = LandbWorker.SaveLandbToFile(filePath, filePath, landb, texts, mapCredits);
-                        if (saveResult.Contains("error") || saveResult.Contains("Error") || saveResult.Contains("don't know"))
+                        bool saveFailed = saveResult.Contains("error") || saveResult.Contains("Error")
+                                       || saveResult.Contains("don't know") || saveResult.Contains("Unknown error");
+
+                        if (saveFailed)
                         {
-                            failFiles++;
-                            OnLogMessage?.Invoke($"Replace ERROR: {Path.GetFileName(filePath)} - {saveResult}");
+                            results.FailFiles++;
+                            OnLogMessage?.Invoke($"Replace ERROR: {fileName} - {saveResult}");
+                            _replaceWorker.ReportProgress(0, new ReplaceProgress { FileName = fileName, Phase = "fail" });
                         }
                         else
                         {
-                            successFiles++;
-                            totalReplaced += fileReplaceCount;
+                            results.SuccessFiles++;
+                            results.TotalReplaced += fileReplaceCount;
 
-                            // Refresh editor if this file is open
                             char? side = OnFileNeedsRefresh?.Invoke(filePath, 'A') == true ? 'A' :
                                          OnFileNeedsRefresh?.Invoke(filePath, 'B') == true ? 'B' : (char?)null;
                             if (side.HasValue)
-                                OnLogMessage?.Invoke($"Refreshed {Path.GetFileName(filePath)} (Side {side.Value})");
+                                OnLogMessage?.Invoke($"Refreshed {fileName} (Side {side.Value})");
+                            _replaceWorker.ReportProgress(0, new ReplaceProgress { FileName = fileName, Phase = "done" });
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    failFiles++;
-                    OnLogMessage?.Invoke($"Replace ERROR: {Path.GetFileName(filePath)} - {ex.Message}");
+                    results.FailFiles++;
+                    OnLogMessage?.Invoke($"Replace ERROR: {fileName} - {ex.Message}");
+                    _replaceWorker.ReportProgress(0, new ReplaceProgress { FileName = fileName, Phase = "fail" });
                 }
             }
 
-            SetStatus($"Replaced: {totalReplaced} in {successFiles} file(s)" +
-                      (failFiles > 0 ? $", {failFiles} failed" : ""), failFiles > 0);
+            e.Result = results;
+        }
 
+        private void ReplaceWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            var prog = e.UserState as ReplaceProgress;
+            if (prog == null) return;
+
+            SetStatus($"Writing: {prog.FileName}  ({e.ProgressPercentage}%)");
+
+            // Highlight ALL items for this file
+            foreach (ListViewItem item in _listResults.Items)
+            {
+                string itemFile = item.Text;
+                if (itemFile == prog.FileName || itemFile.EndsWith("\\" + prog.FileName))
+                {
+                    switch (prog.Phase)
+                    {
+                        case "writing": item.BackColor = Color.LightGoldenrodYellow; break;
+                        case "done": item.BackColor = Color.LightGreen; break;
+                        case "fail": item.BackColor = Color.LightPink; break;
+                    }
+                }
+            }
+        }
+
+        private void ReplaceWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
             _btnFindAll.Enabled = _btnReplacePreview.Enabled = true;
             _btnApplyReplace.Enabled = false;
             _allMatches = null;
 
-            OnLogMessage?.Invoke($"FindInFiles: replaced {totalReplaced} occurrence(s) in {successFiles} file(s)" +
-                                 (failFiles > 0 ? $", {failFiles} failed" : ""));
+            if (e.Error != null)
+            {
+                SetStatus($"Error: {e.Error.Message}", true);
+                return;
+            }
+
+            var results = (ReplaceResults)e.Result;
+            SetStatus($"Replaced: {results.TotalReplaced} in {results.SuccessFiles} file(s)" +
+                      (results.FailFiles > 0 ? $", {results.FailFiles} failed" : ""), results.FailFiles > 0);
+
+            OnLogMessage?.Invoke($"FindInFiles: replaced {results.TotalReplaced} occurrence(s) in {results.SuccessFiles} file(s)" +
+                                 (results.FailFiles > 0 ? $", {results.FailFiles} failed" : ""));
         }
 
         // ===== Navigation =====
@@ -448,18 +563,14 @@ namespace TTG_Tools
             }
         }
 
-        private static void SetFieldValue(CommonText t, string field, string fullValue,
-            int matchPos, int matchLen, string replaceText)
+        private static void SetFieldFromText(ref CommonText t, string field, string value)
         {
-            string newValue = fullValue.Substring(0, matchPos) + replaceText +
-                              fullValue.Substring(matchPos + matchLen);
-
             switch (field)
             {
-                case "speechTranslation": t.actorSpeechTranslation = newValue; break;
-                case "speechOriginal": t.actorSpeechOriginal = newValue; break;
-                case "actor": t.actorName = newValue; break;
-                case "flags": t.flags = newValue; break;
+                case "speechTranslation": t.actorSpeechTranslation = value; break;
+                case "speechOriginal": t.actorSpeechOriginal = value; break;
+                case "actor": t.actorName = value; break;
+                case "flags": t.flags = value; break;
             }
         }
 
@@ -532,6 +643,26 @@ namespace TTG_Tools
         {
             public List<FindInFilesMatch> Matches;
             public SearchArgs Args;
+        }
+
+        private class ReplaceArgs
+        {
+            public List<IGrouping<string, FindInFilesMatch>> FilesToModify;
+            public string ReplaceText;
+            public List<FindInFilesMatch> AllMatches;
+        }
+
+        private class ReplaceProgress
+        {
+            public string FileName;
+            public string Phase; // "writing", "done", "fail"
+        }
+
+        private class ReplaceResults
+        {
+            public int SuccessFiles;
+            public int FailFiles;
+            public int TotalReplaced;
         }
     }
 

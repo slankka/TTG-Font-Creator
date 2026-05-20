@@ -459,6 +459,8 @@ namespace TTG_Tools.Texts
                 bw.BaseStream.Seek(pos, SeekOrigin.Begin);
                 bw.Write(landb.newBlockLength);
 
+                bw.Close();
+                fs.Close();
                 return 0;
             }
             catch

@@ -197,14 +197,11 @@ namespace TTG_Tools
             string selectedText = GetSelectedText(activeSide);
             _findReplaceDlg.Open(selectedText ?? "", activeSide);
 
-            // Position the dialog to the right of the parent form
-            if (!_findReplaceDlg.Visible || _findReplaceDlg.Location.IsEmpty)
-            {
-                _findReplaceDlg.StartPosition = FormStartPosition.Manual;
-                _findReplaceDlg.Location = new System.Drawing.Point(
-                    this.Location.X + this.Width - _findReplaceDlg.Width - 50,
-                    this.Location.Y + 80);
-            }
+            // Always position dialog relative to parent
+            _findReplaceDlg.StartPosition = FormStartPosition.Manual;
+            _findReplaceDlg.Location = new System.Drawing.Point(
+                this.Location.X + this.Width - _findReplaceDlg.Width - 50,
+                this.Location.Y + 80);
         }
 
         private string GetSelectedText(char side)
@@ -471,14 +468,11 @@ namespace TTG_Tools
 
             _findInFilesDlg.Open(selectedText, dir, side, this);
 
-            // Position dialog relative to parent
-            if (!_findInFilesDlg.Visible)
-            {
-                _findInFilesDlg.StartPosition = FormStartPosition.Manual;
-                _findInFilesDlg.Location = new System.Drawing.Point(
-                    this.Location.X + (this.Width - _findInFilesDlg.Width) / 2,
-                    this.Location.Y + (this.Height - _findInFilesDlg.Height) / 2);
-            }
+            // Always position centered on parent
+            _findInFilesDlg.StartPosition = FormStartPosition.Manual;
+            _findInFilesDlg.Location = new System.Drawing.Point(
+                this.Location.X + (this.Width - _findInFilesDlg.Width) / 2,
+                this.Location.Y + (this.Height - _findInFilesDlg.Height) / 2);
         }
 
         private string GetCurrentDirectory(char side)
