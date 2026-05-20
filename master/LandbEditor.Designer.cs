@@ -29,9 +29,9 @@ namespace TTG_Tools
             this._exportCharsBMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._editMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._findMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this._replaceMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this._findNextMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this._findInFilesMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._compareMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._syncScrollMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._mainTable = new System.Windows.Forms.TableLayoutPanel();
@@ -140,31 +140,30 @@ namespace TTG_Tools
 
             // _editMenu
             this._editMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this._findMenu, this._replaceMenu, this.toolStripSeparator3, this._findNextMenu});
+                this._findMenu, this._findNextMenu,
+                this.toolStripSeparator4, this._findInFilesMenu});
             this._editMenu.Name = "_editMenu";
             this._editMenu.Size = new System.Drawing.Size(39, 20);
             this._editMenu.Text = "Edit";
 
             this._findMenu.Name = "_findMenu";
-            this._findMenu.Size = new System.Drawing.Size(180, 22);
-            this._findMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this._findMenu.Text = "Find...";
+            this._findMenu.Size = new System.Drawing.Size(210, 22);
+            this._findMenu.Text = "Find && Replace...";
             this._findMenu.Click += new System.EventHandler(this.OnFindOpen);
 
-            this._replaceMenu.Name = "_replaceMenu";
-            this._replaceMenu.Size = new System.Drawing.Size(180, 22);
-            this._replaceMenu.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
-            this._replaceMenu.Text = "Replace...";
-            this._replaceMenu.Click += new System.EventHandler(this.OnReplaceOpen);
-
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
-
             this._findNextMenu.Name = "_findNextMenu";
-            this._findNextMenu.Size = new System.Drawing.Size(180, 22);
+            this._findNextMenu.Size = new System.Drawing.Size(210, 22);
             this._findNextMenu.ShortcutKeys = System.Windows.Forms.Keys.F3;
             this._findNextMenu.Text = "Find Next";
             this._findNextMenu.Click += new System.EventHandler(this.OnFindNextMenu);
+
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(207, 6);
+
+            this._findInFilesMenu.Name = "_findInFilesMenu";
+            this._findInFilesMenu.Size = new System.Drawing.Size(210, 22);
+            this._findInFilesMenu.Text = "Find && Replace in Files...";
+            this._findInFilesMenu.Click += new System.EventHandler(this.OnFindInFiles);
 
             // _compareMenu
             this._compareMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { this._syncScrollMenu});
@@ -475,9 +474,9 @@ namespace TTG_Tools
         private System.Windows.Forms.ToolStripMenuItem _closeMenu;
         private System.Windows.Forms.ToolStripMenuItem _editMenu;
         private System.Windows.Forms.ToolStripMenuItem _findMenu;
-        private System.Windows.Forms.ToolStripMenuItem _replaceMenu;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem _findNextMenu;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem _findInFilesMenu;
         private System.Windows.Forms.ToolStripMenuItem _compareMenu;
         private System.Windows.Forms.ToolStripMenuItem _syncScrollMenu;
         private System.Windows.Forms.TableLayoutPanel _mainTable;

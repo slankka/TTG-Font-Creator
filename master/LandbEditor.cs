@@ -21,6 +21,7 @@ namespace TTG_Tools
 
         // Find/Replace state
         private FindReplaceDialog _findReplaceDlg;
+        private FindInFilesDialog _findInFilesDlg;
         private int _lastSearchRowA = -1;
         private int _lastSearchRowB = -1;
         private string _lastSearchTextA = "";
@@ -45,6 +46,10 @@ namespace TTG_Tools
             _findReplaceDlg.FindNextClicked += OnFindNextClicked;
             _findReplaceDlg.ReplaceClicked += OnReplaceClicked;
             _findReplaceDlg.ReplaceAllClicked += OnReplaceAllClicked;
+
+            _findInFilesDlg = new FindInFilesDialog();
+            _findInFilesDlg.OnFileNeedsRefresh = IsFileOpenInEditor;
+            _findInFilesDlg.OnLogMessage = Log;
         }
 
         private void HookEditingControls()
@@ -141,15 +146,11 @@ namespace TTG_Tools
                 if (_gridViewB.ContainsFocus) Save('B');
                 else Save('A');
             }
-            else if (e.Control && e.KeyCode == Keys.F)
+            else if ((e.Control && e.KeyCode == Keys.F) || (e.Control && e.KeyCode == Keys.H))
             {
                 e.SuppressKeyPress = true;
-                OpenFindReplace(findMode: true);
-            }
-            else if (e.Control && e.KeyCode == Keys.H)
-            {
-                e.SuppressKeyPress = true;
-                OpenFindReplace(findMode: false);
+                if (e.Shift) OpenFindInFiles();
+                else OpenFindReplace();
             }
             else if (e.KeyCode == Keys.F3)
             {
@@ -190,7 +191,7 @@ namespace TTG_Tools
             else { _lastSearchRowB = lastRow; _lastSearchTextB = lastText; }
         }
 
-        private void OpenFindReplace(bool findMode)
+        private void OpenFindReplace()
         {
             char activeSide = ActiveSide;
             string selectedText = GetSelectedText(activeSide);
@@ -224,9 +225,10 @@ namespace TTG_Tools
 
         // ---- Menu / button handlers ----
 
-        private void OnFindOpen(object sender, EventArgs e) => OpenFindReplace(findMode: true);
-        private void OnReplaceOpen(object sender, EventArgs e) => OpenFindReplace(findMode: false);
+        private void OnFindOpen(object sender, EventArgs e) => OpenFindReplace();
         private void OnFindNextMenu(object sender, EventArgs e) => FindNext();
+
+        private void OnFindInFiles(object sender, EventArgs e) => OpenFindInFiles();
 
         // ---- Dialog event handlers ----
 
@@ -341,7 +343,7 @@ namespace TTG_Tools
             if (_findReplaceDlg == null || string.IsNullOrEmpty(_findReplaceDlg.FindText))
             {
                 // No previous search; open Find dialog
-                OpenFindReplace(findMode: true);
+                OpenFindReplace();
                 return;
             }
 
@@ -457,6 +459,108 @@ namespace TTG_Tools
                 pos = idx + oldValue.Length;
             }
             return sb.ToString();
+        }
+
+        // ========== Find in Files ==========
+
+        private void OpenFindInFiles()
+        {
+            char side = ActiveSide;
+            string dir = GetCurrentDirectory(side);
+            string selectedText = GetSelectedText(side);
+
+            _findInFilesDlg.Open(selectedText, dir, side, this);
+
+            // Position dialog relative to parent
+            if (!_findInFilesDlg.Visible)
+            {
+                _findInFilesDlg.StartPosition = FormStartPosition.Manual;
+                _findInFilesDlg.Location = new System.Drawing.Point(
+                    this.Location.X + (this.Width - _findInFilesDlg.Width) / 2,
+                    this.Location.Y + (this.Height - _findInFilesDlg.Height) / 2);
+            }
+        }
+
+        private string GetCurrentDirectory(char side)
+        {
+            string path = side == 'A' ? _txtPathA.Text : _txtPathB.Text;
+            if (!string.IsNullOrEmpty(path))
+            {
+                if (Directory.Exists(path)) return path;
+                if (File.Exists(path)) return Path.GetDirectoryName(path);
+            }
+            return "";
+        }
+
+        /// <summary>
+        /// Called by FindInFilesDialog to check if a file is currently open in the editor.
+        /// Returns true if the file is loaded on the given side.
+        /// </summary>
+        private bool IsFileOpenInEditor(string filePath, char side)
+        {
+            string currentPath = side == 'A' ? _filePathA : _filePathB;
+            return !string.IsNullOrEmpty(currentPath) &&
+                   string.Equals(currentPath, filePath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Navigates the editor to a specific file and entry, loading the file if needed.
+        /// Called when user double-clicks a result in FindInFilesDialog.
+        /// </summary>
+        internal void NavigateToFileAndEntry(string filePath, int entryIndex, string fieldName)
+        {
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
+
+            // Determine which side to use: try to match directory, fall back to Side A
+            char side;
+            string dir = Path.GetDirectoryName(filePath);
+
+            if (!string.IsNullOrEmpty(_txtPathA.Text) &&
+                dir.StartsWith(_txtPathA.Text, StringComparison.OrdinalIgnoreCase))
+                side = 'A';
+            else if (!string.IsNullOrEmpty(_txtPathB.Text) &&
+                dir.StartsWith(_txtPathB.Text, StringComparison.OrdinalIgnoreCase))
+                side = 'B';
+            else
+                side = 'A';
+
+            // Show the directory in the tree
+            string parentDir = Path.GetDirectoryName(filePath);
+            if (side == 'A' && parentDir != _txtPathA.Text)
+            {
+                _txtPathA.Text = parentDir;
+                RefreshTree(_treeViewA, parentDir);
+            }
+            else if (side == 'B' && parentDir != _txtPathB.Text)
+            {
+                _txtPathB.Text = parentDir;
+                RefreshTree(_treeViewB, parentDir);
+            }
+
+            // Load the file
+            LoadLandbToSide(side, filePath);
+
+            // Navigate to the specific entry
+            var grid = side == 'A' ? _gridViewA : _gridViewB;
+            if (grid == null || grid.Rows.Count == 0) return;
+
+            int targetRow = entryIndex * ROWS_PER_ENTRY;
+            // Determine which sub-row (field) within the entry
+            int fieldOffset;
+            switch (fieldName)
+            {
+                case "actor": fieldOffset = 1; break;
+                case "speechOriginal": fieldOffset = 2; break;
+                case "speechTranslation": fieldOffset = 3; break;
+                case "flags": fieldOffset = 4; break;
+                default: fieldOffset = 0; break;
+            }
+            int rowIndex = targetRow + fieldOffset;
+            if (rowIndex >= 0 && rowIndex < grid.Rows.Count)
+            {
+                SelectCell(grid, rowIndex);
+                Log($"Navigated to {Path.GetFileName(filePath)} entry {entryIndex + 1} ({fieldName})");
+            }
         }
 
         // ========== Directory ==========
@@ -818,12 +922,18 @@ namespace TTG_Tools
                 if (r == DialogResult.Yes) { if (_isDirtyA) Save('A'); if (_isDirtyB) Save('B'); }
                 else if (r == DialogResult.Cancel) { e.Cancel = true; return; }
             }
-            // Clean up modeless dialog
+            // Clean up modeless dialogs
             if (_findReplaceDlg != null && !_findReplaceDlg.IsDisposed)
             {
                 _findReplaceDlg.Close();
                 _findReplaceDlg.Dispose();
                 _findReplaceDlg = null;
+            }
+            if (_findInFilesDlg != null && !_findInFilesDlg.IsDisposed)
+            {
+                _findInFilesDlg.Close();
+                _findInFilesDlg.Dispose();
+                _findInFilesDlg = null;
             }
         }
 
