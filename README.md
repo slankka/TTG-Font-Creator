@@ -16,7 +16,7 @@ Telltale's `.font` binary format (5VSM/6VSM/ERTM) stores glyph textures, charact
 - **Create fonts from scratch**: `New → Import FNT → Import DDS → Save` — build a complete, game-ready `.font` file with no existing source required, generating all texture headers, element tables, and platform-specific metadata automatically
 - **Text-centric workflow**: Designed around a complete fan translation pipeline — **Unpack** archives (ttarch/ttarch2) → **Develop fonts** (create, import, adjust, save) + **Normalize landb text** (CJK spacing, punctuation, line-break fixes) → **Pack** back into archives. Every tool in the **Tools** menu is organized to serve this workflow.
 
-> Note: Create fonts from scratch only works for `The Walking Dead Series Nintendo Switch`. The other game's font such as `Batman: The Telltale Series`, the `oneByte` equals to `0x1` and `UnknowData` bytes still unkown, so use edit to keep the data from original `.font` file, not create. 
+> Note: Create fonts from scratch only works for `The Walking Dead Series`, tested on Nintendo Switch. The other game's font such as `Batman: The Telltale Series`, the `oneByte` is different and `UnknowData` bytes still unkown, so use edit to keep the data from original `.font` file, not create. 
 
 
 ## Recent Changes
