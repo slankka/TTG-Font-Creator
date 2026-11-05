@@ -40,7 +40,7 @@ if (toolProps.mbHasProps) {
 
 So on read the data must be consumed to keep later fields aligned, while on write it is cleared. This explains why most assets carry no tool props and a minority still do.
 
-### 1.4 Runtime measurement (Citron GDB stub)
+### 1.4 Runtime measurement (GDB stub)
 
 A breakpoint at `0x970300` (just after `ldrb w8,[x20]`) read `mName` (`x20-0x214`), `mImportName` (`x20-0x1C`), `mbHasProps` (`x20+0`) and `mPlatform` (`x20+4`) on every hit. Across boot to title screen, pressing A into the main menu, and entering gameplay until dialogue text and dialogue choices appeared, 34937 hits were collected.
 
