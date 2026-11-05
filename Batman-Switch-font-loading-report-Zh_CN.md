@@ -40,7 +40,7 @@ if (toolProps.mbHasProps) {
 
 因此：读入时必须消费这部分数据以保持后续字段对齐；写出时会被主动清除，这解释了「多数资源无属性、少数仍保留」的兼容性。
 
-### 1.4 运行时实测（Citron GDB stub）
+### 1.4 运行时实测（GDB stub）
 
 在 `0x970300`（`ldrb w8,[x20]` 之后）下断点，读取 `mName`（`x20-0x214`）、`mImportName`（`x20-0x1C`）、`mbHasProps`（`x20+0`）、`mPlatform`（`x20+4`）：
 
